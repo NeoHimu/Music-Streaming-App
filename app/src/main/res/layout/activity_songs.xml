@@ -5,7 +5,6 @@
     <android.support.v7.widget.RecyclerView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:id="@+id/idAllSongs"
-        android:paddingLeft="10dp">
+        android:id="@+id/idAllSongs">
     </android.support.v7.widget.RecyclerView>
 </RelativeLayout>
