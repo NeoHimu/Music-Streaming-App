@@ -4,7 +4,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.himanshusingh.www.musicplayer.MainActivity">
+    tools:context="com.himanshusingh.www.musicplayer.MainActivity"
+    >
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -18,13 +19,16 @@
             android:layout_height="wrap_content"
             android:text="Songs"
             android:layout_weight="0.75"
-            android:paddingLeft="20dp"/>
+            android:paddingLeft="20dp"
+            android:textSize="20sp"/>
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="More"
             android:layout_weight="0.25"
-            android:textAlignment="center"/>
+            android:textAlignment="center"
+            android:id="@+id/idMoreSongs"
+            android:textColor="#F00000"/>
     </LinearLayout>
     <android.support.v7.widget.RecyclerView
         android:layout_width="match_parent"
@@ -33,6 +37,7 @@
         android:layout_below="@id/idFirstRV"
         android:paddingLeft="10dp">
     </android.support.v7.widget.RecyclerView>
+
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -47,13 +52,16 @@
             android:layout_height="wrap_content"
             android:text="Albums"
             android:layout_weight="0.75"
-            android:paddingLeft="20dp"/>
+            android:paddingLeft="20dp"
+            android:textSize="20sp"/>
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="More"
             android:layout_weight="0.25"
-            android:textAlignment="center"/>
+            android:textAlignment="center"
+            android:id="@+id/idMoreAlbums"
+            android:textColor="#F00000"/>
     </LinearLayout>
 
     <android.support.v7.widget.RecyclerView
@@ -64,6 +72,7 @@
         android:paddingLeft="10dp"
         >
     </android.support.v7.widget.RecyclerView>
+
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -79,13 +88,16 @@
             android:layout_height="wrap_content"
             android:text="Lyrics"
             android:layout_weight="0.75"
-            android:paddingLeft="20dp"/>
+            android:paddingLeft="20dp"
+            android:textSize="20sp"/>
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="More"
             android:layout_weight="0.25"
-            android:textAlignment="center"/>
+            android:textAlignment="center"
+            android:id="@+id/idMoreLyrics"
+            android:textColor="#F00000"/>
     </LinearLayout>
     <android.support.v7.widget.RecyclerView
         android:layout_width="match_parent"
