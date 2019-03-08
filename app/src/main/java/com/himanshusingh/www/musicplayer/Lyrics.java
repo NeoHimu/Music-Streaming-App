@@ -18,7 +18,7 @@ public class Lyrics extends AppCompatActivity {
         setContentView(R.layout.activity_lyrics);
         RecyclerView allLyricsList = findViewById(R.id.idAllLyrics);
         allLyricsList.setLayoutManager(new LinearLayoutManager(this));
-        String[] desc = {"hello", "hellojijisjid","kdsfk", "hello", "hellojijisjid","kdsfk"};
+        String[] desc = {"hello", "hellojijisjid","kdsfk", "hello", "hellojijisjid","kdsfk", "hello", "hellojijisjid","kdsfk", "hello", "hellojijisjid","kdsfk"};
         allLyricsList.setAdapter(new LyricsAdapterRecyclerView_Vertical(desc));
     }
 }

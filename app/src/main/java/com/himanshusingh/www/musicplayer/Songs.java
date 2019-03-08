@@ -18,7 +18,7 @@ public class Songs extends AppCompatActivity{
         setContentView(R.layout.activity_songs);
         RecyclerView allSongsList = findViewById(R.id.idAllSongs);
         allSongsList.setLayoutManager(new LinearLayoutManager(this));
-        String[] desc = {"hello", "hellojijisjid","kdsfk", "hello", "hellojijisjid","kdsfk"};
+        String[] desc = {"hello", "hellojijisjid","kdsfk", "hello", "hellojijisjid","kdsfk", "hello", "hellojijisjid","kdsfk", "hello", "hellojijisjid","kdsfk"};
         allSongsList.setAdapter(new SongsAdapterRecyclerView_Vertical(desc));
 
     }

@@ -17,7 +17,7 @@ public class Albums extends AppCompatActivity {
         setContentView(R.layout.activity_albums);
         RecyclerView allAlbumsList = findViewById(R.id.idAllAlbums);
         allAlbumsList.setLayoutManager(new LinearLayoutManager(this));
-        String[] desc = {"hello", "hellojijisjid","kdsfk", "hello", "hellojijisjid","kdsfk"};
+        String[] desc = {"hello", "hellojijisjid","kdsfk", "hello", "hellojijisjid","kdsfk", "hello", "hellojijisjid","kdsfk", "hello", "hellojijisjid","kdsfk"};
         allAlbumsList.setAdapter(new AlbumAdapterRecyclerView_Vertical(desc));
     }
 }
