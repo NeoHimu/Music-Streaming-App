@@ -14,6 +14,7 @@ import java.io.IOException;
 public class MusicManager {
     public static MediaPlayer player=new MediaPlayer();
     public static boolean isPlaying = false;
+    public static int duration=0;
     public static void SoundPlayer(Context ctx, String song_url, final ProgressDialog progressDialog){
         player.setAudioStreamType(AudioManager.STREAM_MUSIC);
         player.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
@@ -23,6 +24,7 @@ public class MusicManager {
                 mp.start();
                 isPlaying = true;
                 progressDialog.dismiss();
+                duration = player.getDuration();
             }
         });
         player.setLooping(false); // Set looping

@@ -1,11 +1,13 @@
 package com.himanshusingh.www.musicplayer;
 
+import android.Manifest;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.database.Cursor;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
@@ -18,22 +20,22 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.himanshusingh.www.musicplayer.models.AlbumLyricsModel;
+import com.himanshusingh.www.musicplayer.models.LyricsModel;
+
 import java.io.IOException;
 import java.util.ArrayList;
 
-public class MainActivity extends AppCompatActivity implements SongsAdapterRecyclerView.OnSongClickListener{
-
+public class MainActivity extends AppCompatActivity implements SongsAdapterRecyclerView.OnSongClickListener, LyricsAdapterRecyclerView.OnLyricsClickListener{
     TextView tvMoreSongs, tvMoreAlbums, tvMoreLyrics;
-    private MediaPlayer mMediaPlayer;
     private ImageView mPlayerControl;
     Toolbar toolbar;
-    public boolean isPlaying = false;
     int pos=0;
     ProgressDialog progress;
-//    DatabaseHelper databaseHelper;
     RecyclerView songsList;
-    ArrayList<String> song_urls;
-    ArrayList<String> song_names;
+    ArrayList<LyricsModel> lyricsModelArrayList;
+    ArrayList<AlbumLyricsModel> albumLyricsModelArrayList;
+    ArrayList<String> songs_name;
     private TextView mSelectedTrackTitle;
     private ImageView mSelectedTrackImage;
     public boolean initialStage=true;
@@ -50,29 +52,11 @@ public class MainActivity extends AppCompatActivity implements SongsAdapterRecyc
         tvMoreLyrics = findViewById(R.id.idMoreLyrics);
         mPlayerControl = (ImageView)findViewById(R.id.id_player_control);
 
-//        mMediaPlayer = new MediaPlayer();
-//        mMediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
-//        mMediaPlayer.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
-//            @Override
-//            public void onPrepared(MediaPlayer mp) {
-//                //togglePlayPause();
-//                mp.start();
-//                isPlaying = true;
-//                mPlayerControl.setImageResource(R.drawable.icon_pause);
-//                // To dismiss the dialog
-//                progress.dismiss();
-//            }
-//        });
-        Bundle bundle = getIntent().getExtras();
-        song_urls = bundle.getStringArrayList("data");
-        song_names = new ArrayList<String>();
-        String temp_url;
-        for(int i=0;i<song_urls.size();i++)
-        {
-            temp_url = song_urls.get(i);
-            song_names.add(temp_url.split("/")[temp_url.split("/").length-1]);
-        }
+        lyricsModelArrayList = getIntent().getParcelableArrayListExtra("lyrics");
+        albumLyricsModelArrayList = getIntent().getParcelableArrayListExtra("album_lyrics");
 
+        songs_name = new ArrayList<>();
+        songs_name.add("test");
         mPlayerControl.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -89,31 +73,25 @@ public class MainActivity extends AppCompatActivity implements SongsAdapterRecyc
         mSelectedTrackTitle.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent i = new Intent(MainActivity.this, Player.class);
-                i.putStringArrayListExtra("song_urls", song_urls);
-                i.putExtra("current_song_name", song_names.get(pos));
-                i.putExtra("song_pos", pos);
-                startActivity(i);
+//                Intent i = new Intent(MainActivity.this, Player.class);
+//                i.putStringArrayListExtra("song_urls", song_urls);
+//                i.putExtra("current_song_name", song_names.get(pos));
+//                i.putExtra("song_pos", pos);
+//                startActivity(i);
             }
         });
 
         mSelectedTrackImage.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent i = new Intent(MainActivity.this, Player.class);
-                i.putStringArrayListExtra("song_urls", song_urls);
-                i.putExtra("current_song_name", song_names.get(pos));
-                i.putExtra("song_pos", pos);
-                startActivity(i);
+//                Intent i = new Intent(MainActivity.this, Player.class);
+//                i.putStringArrayListExtra("song_urls", song_urls);
+//                i.putExtra("current_song_name", song_names.get(pos));
+//                i.putExtra("song_pos", pos);
+//                startActivity(i);
             }
         });
 
-//        mMediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
-//            @Override
-//            public void onCompletion(MediaPlayer mp) {
-//                mPlayerControl.setImageResource(R.drawable.icon_play);
-//            }
-//        });
 
         tvMoreSongs.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -138,10 +116,9 @@ public class MainActivity extends AppCompatActivity implements SongsAdapterRecyc
                 startActivity(i);
             }
         });
-
         songsList = findViewById(R.id.idRVSongs);
         songsList.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
-        songsList.setAdapter(new SongsAdapterRecyclerView(song_names, this));
+        songsList.setAdapter(new SongsAdapterRecyclerView(songs_name, this));
 
         RecyclerView albumList = findViewById(R.id.idRVAlbums);
         albumList.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
@@ -150,10 +127,9 @@ public class MainActivity extends AppCompatActivity implements SongsAdapterRecyc
 
         RecyclerView lyricsList = findViewById(R.id.idRVLyrics);
         lyricsList.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
-        String[] desc2 = {"hello", "whatsup","kdsfk", "hello", "hellojijisjid","kdsfk"};
-        lyricsList.setAdapter(new LyricsAdapterRecyclerView(desc2));
-
+        lyricsList.setAdapter(new LyricsAdapterRecyclerView(albumLyricsModelArrayList, this));
     }
+
     private void togglePlayPause() {
         if (MusicManager.isPlaying == true) {
             MusicManager.player.pause();
@@ -164,50 +140,31 @@ public class MainActivity extends AppCompatActivity implements SongsAdapterRecyc
             MusicManager.player.start();
             mPlayerControl.setImageResource(R.drawable.icon_pause);
         }
-//        if (isPlaying == true) {
-//            mMediaPlayer.pause();
-//            isPlaying = false;
-//            mPlayerControl.setImageResource(R.drawable.icon_play);
-//        } else {
-//            isPlaying = true;
-//            mMediaPlayer.start();
-//            mPlayerControl.setImageResource(R.drawable.icon_pause);
-//        }
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if(MusicManager.isPlaying==true)
+            mPlayerControl.setImageResource(R.drawable.icon_pause);
+        else
+            mPlayerControl.setImageResource(R.drawable.icon_play);
     }
 
     @Override
     public void onSongClick(int position) {
-//        Log.d("Song: ",song_urls.get(position));
-//        Intent i = new Intent(MainActivity.this, Player.class);
-//        i.putExtra("urls", song_urls);
-//        i.putExtra("pos", position);
-//        i.putExtra("song_id", "song_horizontal_"+position);
-//        startActivity(i);
-        pos = position;
-        mPlayerControl.setImageResource(R.drawable.icon_pause);
-//        toolbar.setBackgroundColor(333333);
-        mSelectedTrackTitle.setText(song_names.get(position));
-        mSelectedTrackImage.setBackgroundResource(R.drawable.icon_cover);
-
-        progress = new ProgressDialog(this);
-        progress.setTitle("Loading");
-        progress.setMessage("Wait while loading...");
-        progress.setCancelable(false); // disable dismiss by tapping outside of the dialog
-        progress.show();
-//        isPlaying = true;
-//        if(mMediaPlayer!=null)
-//        {
-//            mMediaPlayer.stop();
-//            mMediaPlayer.reset();
-//        }
+//        pos = position;
+//        mPlayerControl.setImageResource(R.drawable.icon_pause);
+////        toolbar.setBackgroundColor(333333);
+//        mSelectedTrackTitle.setText(song_names.get(position));
+//        mSelectedTrackImage.setBackgroundResource(R.drawable.icon_cover);
 //
-//        try {
-//            mMediaPlayer.setDataSource(song_urls.get(position));
-//            mMediaPlayer.prepareAsync();
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//        }
-        MusicManager.SoundPlayer(this, song_urls.get(position), progress);
+//        progress = new ProgressDialog(this);
+//        progress.setTitle("Loading");
+//        progress.setMessage("Wait while loading...");
+//        progress.setCancelable(false); // disable dismiss by tapping outside of the dialog
+//        progress.show();
+//        MusicManager.SoundPlayer(this, song_urls.get(position), progress);
     }
 
     @Override
@@ -218,12 +175,19 @@ public class MainActivity extends AppCompatActivity implements SongsAdapterRecyc
     @Override
     protected void onDestroy() {
         super.onDestroy();
-//        if (mMediaPlayer != null) {
-//            if (mMediaPlayer.isPlaying()) {
-//                mMediaPlayer.stop();
-//            }
-//            mMediaPlayer.release();
-//            mMediaPlayer = null;
-//        }
+    }
+
+    @Override
+    public void onLyricsTitleClick(int position) {
+
+    }
+
+    @Override
+    public void onLyricsImageClick(int position) {
+        Intent i = new Intent(MainActivity.this, LyricsAlbum.class);
+        //i.putExtra("image_url", Endpoints.BASE_URL+albumLyricsModelArrayList.get(position).getAlbumCoverImagePath().substring(2));
+        i.putExtra("album_lyrics_one_item", albumLyricsModelArrayList.get(position));
+        startActivity(i);
+
     }
 }

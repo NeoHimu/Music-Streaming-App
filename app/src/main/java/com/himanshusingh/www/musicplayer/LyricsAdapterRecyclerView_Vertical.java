@@ -7,16 +7,20 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import java.util.ArrayList;
+
 /**
  * Created by himanshu on 26/2/19.
  */
 
 public class LyricsAdapterRecyclerView_Vertical extends RecyclerView.Adapter<LyricsAdapterRecyclerView_Vertical.LyricsViewHolder> {
 
-    private String[] data;
-    public LyricsAdapterRecyclerView_Vertical(String[] data)
+    private ArrayList<String> titles;
+    private ArrayList<String> urls;
+    public LyricsAdapterRecyclerView_Vertical(ArrayList<String> titles, ArrayList<String> urls)
     {
-        this.data = data;
+        this.titles = titles;
+        this.urls = urls;
     }
 
     @Override
@@ -28,13 +32,13 @@ public class LyricsAdapterRecyclerView_Vertical extends RecyclerView.Adapter<Lyr
 
     @Override
     public void onBindViewHolder(LyricsViewHolder holder, int position) {
-        String title = data[position];
+        String title = titles.get(position);
         holder.textView.setText(title);
     }
 
     @Override
     public int getItemCount() {
-        return data.length;
+        return titles.size();
     }
 
     public class LyricsViewHolder extends RecyclerView.ViewHolder {

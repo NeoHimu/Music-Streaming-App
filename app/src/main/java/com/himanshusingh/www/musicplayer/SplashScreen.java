@@ -6,6 +6,7 @@ import android.graphics.Color;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Parcel;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
@@ -17,6 +18,10 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
+import com.himanshusingh.www.musicplayer.models.AlbumLyricsModel;
+import com.himanshusingh.www.musicplayer.models.AlbumModel;
+import com.himanshusingh.www.musicplayer.models.BhajanModel;
+import com.himanshusingh.www.musicplayer.models.LyricsModel;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -31,20 +36,19 @@ import java.util.ArrayList;
 
 interface OnFetchUrlsListener
 {
-    public void onUrlsFetched(ArrayList<String> arrayList);
+    public void onUrlsFetched(ArrayList<LyricsModel> arrayList, ArrayList<AlbumModel> albumModelArrayList, ArrayList<AlbumLyricsModel> albumLyricsModelArrayList, ArrayList<BhajanModel> bhajanModelArrayList);
     public void onUrlsError(String error);
 }
 
 public class SplashScreen extends AppCompatActivity implements OnFetchUrlsListener{
 
     @Override
-    public void onUrlsFetched(ArrayList<String> arrayList) {
-        //for(int i=0;i<arrayList.size();i++)
-        //    Toast.makeText(this, "result size : "+arrayList.get(i), Toast.LENGTH_SHORT).show();
-
+    public void onUrlsFetched(ArrayList<LyricsModel> lyricsModelArrayList, ArrayList<AlbumModel> albumModelArrayList, ArrayList<AlbumLyricsModel> albumLyricsModelArrayList, ArrayList<BhajanModel> bhajanModelArrayList) {
         Intent i = new Intent(SplashScreen.this, MainActivity.class);
-        i.putStringArrayListExtra("data", arrayList);
-//        Toast.makeText(SplashScreen.this, "songs array ka size : "+songsArray.size(), Toast.LENGTH_SHORT).show();
+        i.putParcelableArrayListExtra("lyrics", lyricsModelArrayList);
+        i.putParcelableArrayListExtra("album", albumModelArrayList);
+        i.putParcelableArrayListExtra("album_lyrics", albumLyricsModelArrayList);
+        i.putParcelableArrayListExtra("bhajan", bhajanModelArrayList    );
         startActivity(i);
         finish();
     }
@@ -55,73 +59,39 @@ public class SplashScreen extends AppCompatActivity implements OnFetchUrlsListen
     }
 
 //    private static int SPLASH_TIME = 4000; //This is 4 seconds
-    private static RequestQueue mQueue;
     public ArrayList<String> songsArray = new ArrayList<String>();
     public static ArrayList<String> songsName = new ArrayList<String>();
     private boolean songs_fetched=false;
 
-    DatabaseHelper databaseHelper;
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_splash_screen);
         getWindow().getDecorView().setBackgroundColor(Color.BLACK);
-        databaseHelper = new DatabaseHelper(this);
         //Since there is no fixed time to start the activity, splash screen should be done as
         //Async task
-        mQueue = Volley.newRequestQueue(this);
-        String url = "http://9bf6f434.ngrok.io/audio/data/WebsiteSourceCode/api/all_songs.php/?allsongs=allsongs";
-        VolleyCall call = new VolleyCall(SplashScreen.this, url, SplashScreen.this);
+        VolleyCall call = new VolleyCall(SplashScreen.this, Endpoints.API_URL, SplashScreen.this);
         call.parse();
-//        String uri = Uri.parse("http://ef2e9248.ngrok.io/audio/data/WebsiteSourceCode/api/all_songs.php/?allsongs=allsongs").toString();
-//        new FetchSongs(this).execute(uri);
-//        Toast.makeText(this, startHeavyProcessing(uri).size()+"", Toast.LENGTH_SHORT).show();
-//        Toast.makeText(this, songsArray.size()+"", Toast.LENGTH_SHORT).show();
     }
 
-    private ArrayList<String> startHeavyProcessing(String uri) {
-        final ArrayList<String> result = new ArrayList<String>();
-        JsonObjectRequest request = new JsonObjectRequest(Request.Method.GET, uri, null,
-                new Response.Listener<JSONObject>() {
-                    @Override
-                    public void onResponse(JSONObject response) {
-                        try {
-                            JSONArray jsonArray = response.getJSONArray("data");
-
-                            for (int i = 0; i < jsonArray.length(); i++) {
-                                result.add(jsonArray.getString(i));
-                                songsArray.add(jsonArray.getString(i));
-                                //Toast.makeText(SplashScreen.this, jsonArray.getString(i), Toast.LENGTH_SHORT).show();
-                            }
-                            songs_fetched = true;
-
-                        }
-                        catch (JSONException e) {
-                            e.printStackTrace();
-                            songs_fetched = false;
-                            Log.d("JSON Parse", String.valueOf(e));
-                        }
-
-                    }
-                }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                error.printStackTrace();
-                Toast.makeText(SplashScreen.this, "Load error!!", Toast.LENGTH_SHORT).show();
-            }
-        });
-        mQueue.add(request);
-        return result;
-    }
     public class VolleyCall {
         private String TAG = VolleyCall.class.getSimpleName();
         private String mUrl;
         private OnFetchUrlsListener mOnFetchUrlsListener;
         private ArrayList<String> mSongs;
+        private ArrayList<LyricsModel> mLyrics;
+        private ArrayList<AlbumModel> mAlbums;
+        private ArrayList<AlbumLyricsModel> mAlbumLyrics;
+        private ArrayList<BhajanModel> mBhajan;
         private RequestQueue mQueue;
 
         public VolleyCall(Context context, String url, OnFetchUrlsListener onFetchUrlsListener) {
             mSongs = new ArrayList<>();
+            mLyrics = new ArrayList<>();
+            mAlbumLyrics = new ArrayList<>();
+            mAlbums = new ArrayList<>();
+            mBhajan = new ArrayList<>();
+
             mUrl = url;
             mOnFetchUrlsListener = onFetchUrlsListener;
 
@@ -135,13 +105,66 @@ public class SplashScreen extends AppCompatActivity implements OnFetchUrlsListen
                         public void onResponse(JSONObject response) {
                             try {
                                 Log.e(TAG, "_log : onResponse : response : " + response.toString());
-                                JSONArray jsonArray = response.getJSONArray("data");
+                                JSONArray jsonArray = response.getJSONArray("getLyrics");
 
                                 for (int i = 0; i < jsonArray.length(); i++) {
-                                    mSongs.add(jsonArray.getString(i));
+                                    JSONObject jsonObject = jsonArray.getJSONObject(i);
+                                    String album = jsonObject.getString("Album");
+                                    String lyrics = jsonObject.getString("Lyrics");
+                                    String location = jsonObject.getString("Location");
+                                    String download = jsonObject.getString("Downloads");
+                                    LyricsModel lyricsModel = new LyricsModel(album, lyrics, location, download);
+                                    mLyrics.add(lyricsModel);
                                 }
 
-                                mOnFetchUrlsListener.onUrlsFetched(mSongs);
+
+//                                Log.e(TAG, "_log : onResponse : response : " + response.toString());
+                                JSONArray jsonAlbumArray = response.getJSONArray("getAlbum");
+
+                                for (int i = 0; i < jsonAlbumArray.length(); i++) {
+                                    JSONObject jsonObject = jsonAlbumArray.getJSONObject(i);
+                                    String album = jsonObject.getString("Album");
+                                    String totalSize = jsonObject.getString("TotalSize");
+                                    int totalBhajan=0;
+                                    if(jsonObject.has("TotalBhajan"))
+                                       totalBhajan = jsonObject.getInt("TotalBhajan");
+                                    String albumCoverImagePath = jsonObject.getString("AlbumCoverImagePath");
+                                    String albumPath = jsonObject.getString("AlbumPath");
+                                    String year = jsonObject.getString("Year");
+                                    int downloads = jsonObject.getInt("Downloads");
+                                    AlbumModel albumModel = new AlbumModel(album, totalSize, totalBhajan, albumCoverImagePath, albumPath, year, downloads);
+                                    mAlbums.add(albumModel);
+                                }
+
+
+                                JSONArray jsonAlbumLyricsArray = response.getJSONArray("getAlbumLyrics");
+
+                                for (int i = 0; i < jsonAlbumLyricsArray.length(); i++) {
+                                    JSONObject jsonObject = jsonAlbumLyricsArray.getJSONObject(i);
+                                    String album = jsonObject.getString("Album");
+                                    String location = jsonObject.getString("Location");
+                                    String albumCoverImagePath = jsonObject.getString("AlbumCoverImagePath");
+                                    int totalLyrics = jsonObject.getInt("TotalLyrics");
+                                    int downloads = jsonObject.getInt("Downloads");
+                                    String pdfLocation = jsonObject.getString("PDFLocation");
+                                    int pdfDownloads = jsonObject.getInt("PDFDownloads");
+                                    AlbumLyricsModel albumLyricsModel = new AlbumLyricsModel(album, location, albumCoverImagePath, totalLyrics, downloads, pdfLocation, pdfDownloads);
+                                    mAlbumLyrics.add(albumLyricsModel);
+                                }
+
+                                JSONArray jsonBhajanArray = response.getJSONArray("getBhajan");
+
+                                for (int i = 0; i < jsonBhajanArray.length(); i++) {
+                                    JSONObject jsonObject = jsonBhajanArray.getJSONObject(i);
+                                    String lyrics = jsonObject.getString("Lyrics");
+                                    String album = jsonObject.getString("Album");
+                                    String location = jsonObject.getString("Location");
+                                    int downloads = jsonObject.getInt("Downloads");
+                                    BhajanModel bhajanModel = new BhajanModel(lyrics, album, location, downloads);
+                                    mBhajan.add(bhajanModel);
+                                }
+
+                                mOnFetchUrlsListener.onUrlsFetched(mLyrics, mAlbums, mAlbumLyrics, mBhajan);
 
                             } catch (JSONException e) {
                                 Log.e(TAG, "_log : onResponse : JSONException : " + e.getMessage());
@@ -161,79 +184,45 @@ public class SplashScreen extends AppCompatActivity implements OnFetchUrlsListen
         }
     }
 
+    //    private ArrayList<LyricsModel> startHeavyProcessing(String uri) {
+//        final ArrayList<LyricsModel> result = new ArrayList<LyricsModel>();
+//        JsonObjectRequest request = new JsonObjectRequest(Request.Method.GET, uri, null,
+//                new Response.Listener<JSONObject>() {
+//                    @Override
+//                    public void onResponse(JSONObject response) {
+//                        try {
+//                            JSONArray jsonArray = response.getJSONArray("getData");
 //
-//    private class FetchSongs extends AsyncTask<String, String, ArrayList<String>> {
-//        private OnFetchUrlsListener mListener;
-//        public FetchSongs(OnFetchUrlsListener listener){
-//            mListener = listener;
-//        }
-//
-//        @Override
-//        protected ArrayList<String> doInBackground(String... params) {
-//            //some heavy processing resulting in a Data String
-////            databaseHelper.eraseOldValues();
-////            final ArrayList<String> s = new ArrayList<String>();
-//            JsonObjectRequest request = new JsonObjectRequest(Request.Method.GET, params[0], null,
-//                    new Response.Listener<JSONObject>() {
-//                        @Override
-//                        public void onResponse(JSONObject response) {
-//                            try {
-//                                JSONArray jsonArray = response.getJSONArray("data");
-//
-//                                for (int i = 0; i < jsonArray.length(); i++) {
-//                                    songsArray.add(jsonArray.getString(i));
-////                                    String[] str = song_url.split("/");
-////                                    songsName.add(str[str.length-1]+ "\n");
-////                                    Log.d("Inside Json", jsonArray.getString(i));
-////                                    databaseHelper.insertSongURL(jsonArray.getString(i));
-////                                    onProgressUpdate(jsonArray.getString(i));
-//                                }
-//                                songs_fetched = true;
-//
+//                            for (int i = 0; i < jsonArray.length(); i++) {
+//                                //result.add(jsonArray.getString(i));
+//                                //songsArray.add(jsonArray.getString(i));
+//                                //Toast.makeText(SplashScreen.this, jsonArray.getString(i), Toast.LENGTH_SHORT).show();
+//                                JSONObject jsonObject = jsonArray.getJSONObject(i);
+//                                LyricsModel lyricsModel = new LyricsModel();
+//                                lyricsModel.setAlbum(jsonObject.getString("Album"));
+//                                lyricsModel.setAlbum(jsonObject.getString("Lyrics"));
+//                                lyricsModel.setAlbum(jsonObject.getString("Location"));
+//                                lyricsModel.setAlbum(jsonObject.getString("Downloads"));
+//                                result.add(lyricsModel);
 //                            }
-//                            catch (JSONException e) {
-//                                e.printStackTrace();
-//                                songs_fetched = false;
-//                                Log.d("JSON Parse", String.valueOf(e));
-//                            }
+//                            songs_fetched = true;
 //
 //                        }
-//                    }, new Response.ErrorListener() {
-//                @Override
-//                public void onErrorResponse(VolleyError error) {
-//                    error.printStackTrace();
-//                    Toast.makeText(SplashScreen.this, "Load error!!", Toast.LENGTH_SHORT).show();
-//                }
-//            });
-//            mQueue.add(request);
-//            return songsArray;
-//        }
+//                        catch (JSONException e) {
+//                            e.printStackTrace();
+//                            songs_fetched = false;
+//                            Log.d("JSON Parse", String.valueOf(e));
+//                        }
 //
-//        @Override
-//        protected void onPreExecute() {}
-//
-////        @Override
-//////        protected void onProgressUpdate(String... values) {
-//////            super.onProgressUpdate(values);
-//////            Toast.makeText(SplashScreen.this, ""+values[0], Toast.LENGTH_SHORT).show();
-//////            songsArray.add(values[0]);
-//////            String[] str = values[0].split("/");
-//////            songsName.add(str[str.length-1]+ "\n");
-//////        }
-//        @Override
-//        protected void onPostExecute(ArrayList<String> result) {
-//
-//            if(mListener!=null)
-//            {
-//                mListener.onUrlsFetched(result);
+//                    }
+//                }, new Response.ErrorListener() {
+//            @Override
+//            public void onErrorResponse(VolleyError error) {
+//                error.printStackTrace();
+//                Toast.makeText(SplashScreen.this, "Load error!!", Toast.LENGTH_SHORT).show();
 //            }
-//
-////            Toast.makeText(SplashScreen.this, result.size()+"", Toast.LENGTH_SHORT).show();
-////            Intent i = new Intent(SplashScreen.this, MainActivity.class);
-////            i.putExtra("data", result);
-////            Toast.makeText(SplashScreen.this, "songs array ka size : "+songsArray.size(), Toast.LENGTH_SHORT).show();
-////            startActivity(i);
-////            finish();
-//        }
+//        });
+//        mQueue.add(request);
+//        return result;
 //    }
 }

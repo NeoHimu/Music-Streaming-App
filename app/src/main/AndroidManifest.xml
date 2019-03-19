@@ -26,8 +26,8 @@
         <activity android:name=".Albums" />
         <activity android:name=".Lyrics" />
         <activity android:name=".Player" />
-        <service android:enabled="true"
-            android:name="com.himanshusingh.www.musicplayer.PlayerService"/>
+        <activity android:name=".ShowLyrics" />
+        <activity android:name=".LyricsAlbum" />
     </application>
 
 </manifest>
