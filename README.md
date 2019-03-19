@@ -16,3 +16,6 @@ PHP REST API : https://www.youtube.com/watch?v=5eWC-lf1FxM
 RecyclerView click event : https://www.youtube.com/watch?v=69C1ljfDvl0 This video just tells about clicking a view. This code can easily be modified to capture events for click on each part of the view i.e. ImageView, TextView inside the recycler view.
 
 Music Streaming and handling seekbar : https://www.youtube.com/watch?v=J3kwFMkAsJ0
+
+These two links helped a lot : https://www.sitepoint.com/develop-music-streaming-android-app/
+https://stackoverflow.com/questions/14728945/play-stop-sound-from-another-activity
