@@ -23,7 +23,7 @@ import java.util.ArrayList;
 public class LyricsAdapterRecyclerView extends RecyclerView.Adapter<LyricsAdapterRecyclerView.LyricsViewHolder> {
 
     private ArrayList<AlbumLyricsModel> albumLyricsModelArrayList;
-    OnLyricsClickListener mOnLyricsClickListener;
+    private OnLyricsClickListener mOnLyricsClickListener;
     public LyricsAdapterRecyclerView(ArrayList<AlbumLyricsModel> albumLyricsModelArrayList, OnLyricsClickListener onLyricsClickListener)
     {
         this.albumLyricsModelArrayList = albumLyricsModelArrayList;
@@ -60,12 +60,16 @@ public class LyricsAdapterRecyclerView extends RecyclerView.Adapter<LyricsAdapte
             imageView = itemView.findViewById(R.id.idImgLyricsRV);
             textView = itemView.findViewById(R.id.idDescLyricsRV);
             imageView.setOnClickListener(this);
+            textView.setOnClickListener(this);
             this.onLyricsClickListener = onLyricsClickListener;
         }
 
         @Override
         public void onClick(View v) {
-            onLyricsClickListener.onLyricsImageClick(getAdapterPosition());
+            if(v==imageView)
+                onLyricsClickListener.onLyricsImageClick(getAdapterPosition());
+            else if(v==textView)
+                onLyricsClickListener.onLyricsTitleClick(getAdapterPosition());
         }
     }
 

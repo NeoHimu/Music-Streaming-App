@@ -36,19 +36,20 @@ import java.util.ArrayList;
 
 interface OnFetchUrlsListener
 {
-    public void onUrlsFetched(ArrayList<LyricsModel> arrayList, ArrayList<AlbumModel> albumModelArrayList, ArrayList<AlbumLyricsModel> albumLyricsModelArrayList, ArrayList<BhajanModel> bhajanModelArrayList);
+    public void onUrlsFetched(ArrayList<LyricsModel> arrayList, ArrayList<AlbumModel> albumModelArrayList, ArrayList<AlbumLyricsModel> albumLyricsModelArrayList, ArrayList<BhajanModel> bhajanModelArrayList, ArrayList<String> allSongs);
     public void onUrlsError(String error);
 }
 
 public class SplashScreen extends AppCompatActivity implements OnFetchUrlsListener{
 
     @Override
-    public void onUrlsFetched(ArrayList<LyricsModel> lyricsModelArrayList, ArrayList<AlbumModel> albumModelArrayList, ArrayList<AlbumLyricsModel> albumLyricsModelArrayList, ArrayList<BhajanModel> bhajanModelArrayList) {
+    public void onUrlsFetched(ArrayList<LyricsModel> lyricsModelArrayList, ArrayList<AlbumModel> albumModelArrayList, ArrayList<AlbumLyricsModel> albumLyricsModelArrayList, ArrayList<BhajanModel> bhajanModelArrayList, ArrayList<String> allSongs) {
         Intent i = new Intent(SplashScreen.this, MainActivity.class);
         i.putParcelableArrayListExtra("lyrics", lyricsModelArrayList);
         i.putParcelableArrayListExtra("album", albumModelArrayList);
         i.putParcelableArrayListExtra("album_lyrics", albumLyricsModelArrayList);
-        i.putParcelableArrayListExtra("bhajan", bhajanModelArrayList    );
+        i.putParcelableArrayListExtra("bhajan", bhajanModelArrayList);
+        i.putStringArrayListExtra("allsongs", allSongs);
         startActivity(i);
         finish();
     }
@@ -83,6 +84,7 @@ public class SplashScreen extends AppCompatActivity implements OnFetchUrlsListen
         private ArrayList<AlbumModel> mAlbums;
         private ArrayList<AlbumLyricsModel> mAlbumLyrics;
         private ArrayList<BhajanModel> mBhajan;
+        private ArrayList<String> mAllSongs;
         private RequestQueue mQueue;
 
         public VolleyCall(Context context, String url, OnFetchUrlsListener onFetchUrlsListener) {
@@ -91,6 +93,7 @@ public class SplashScreen extends AppCompatActivity implements OnFetchUrlsListen
             mAlbumLyrics = new ArrayList<>();
             mAlbums = new ArrayList<>();
             mBhajan = new ArrayList<>();
+            mAllSongs = new ArrayList<>();
 
             mUrl = url;
             mOnFetchUrlsListener = onFetchUrlsListener;
@@ -109,10 +112,23 @@ public class SplashScreen extends AppCompatActivity implements OnFetchUrlsListen
 
                                 for (int i = 0; i < jsonArray.length(); i++) {
                                     JSONObject jsonObject = jsonArray.getJSONObject(i);
-                                    String album = jsonObject.getString("Album");
-                                    String lyrics = jsonObject.getString("Lyrics");
-                                    String location = jsonObject.getString("Location");
-                                    String download = jsonObject.getString("Downloads");
+
+                                    String album = "Err";
+                                    if(jsonObject.has("Album"))
+                                        album = jsonObject.getString("Album");
+
+                                    String lyrics="Err";
+                                    if(jsonObject.has("MoreLyrics"))
+                                        lyrics = jsonObject.getString("MoreLyrics");
+
+                                    String location="Err";
+                                    if(jsonObject.has("Location"))
+                                        location = jsonObject.getString("Location");
+
+                                    String download="Err";
+                                    if(jsonObject.has("Downloads"))
+                                        download = jsonObject.getString("Downloads");
+
                                     LyricsModel lyricsModel = new LyricsModel(album, lyrics, location, download);
                                     mLyrics.add(lyricsModel);
                                 }
@@ -123,15 +139,34 @@ public class SplashScreen extends AppCompatActivity implements OnFetchUrlsListen
 
                                 for (int i = 0; i < jsonAlbumArray.length(); i++) {
                                     JSONObject jsonObject = jsonAlbumArray.getJSONObject(i);
-                                    String album = jsonObject.getString("Album");
-                                    String totalSize = jsonObject.getString("TotalSize");
+                                    String album="Err";
+                                    if(jsonObject.has("Album"))
+                                        album = jsonObject.getString("Album");
+
+                                    String totalSize="Err";
+                                    if(jsonObject.has("TotalSize"))
+                                        totalSize = jsonObject.getString("TotalSize");
+
                                     int totalBhajan=0;
                                     if(jsonObject.has("TotalBhajan"))
                                        totalBhajan = jsonObject.getInt("TotalBhajan");
-                                    String albumCoverImagePath = jsonObject.getString("AlbumCoverImagePath");
-                                    String albumPath = jsonObject.getString("AlbumPath");
-                                    String year = jsonObject.getString("Year");
-                                    int downloads = jsonObject.getInt("Downloads");
+
+                                    String albumCoverImagePath="Err";
+                                    if(jsonObject.has("AlbumCoverImagePath"))
+                                        albumCoverImagePath = jsonObject.getString("AlbumCoverImagePath");
+
+                                    String albumPath="Err";
+                                    if(jsonObject.has("AlbumPath"))
+                                        albumPath = jsonObject.getString("AlbumPath");
+
+                                    String year="Err";
+                                    if(jsonObject.has("Year"))
+                                        year = jsonObject.getString("Year");
+
+                                    int downloads=0;
+                                    if(jsonObject.has("Downloads"))
+                                        downloads = jsonObject.getInt("Downloads");
+
                                     AlbumModel albumModel = new AlbumModel(album, totalSize, totalBhajan, albumCoverImagePath, albumPath, year, downloads);
                                     mAlbums.add(albumModel);
                                 }
@@ -141,13 +176,27 @@ public class SplashScreen extends AppCompatActivity implements OnFetchUrlsListen
 
                                 for (int i = 0; i < jsonAlbumLyricsArray.length(); i++) {
                                     JSONObject jsonObject = jsonAlbumLyricsArray.getJSONObject(i);
-                                    String album = jsonObject.getString("Album");
-                                    String location = jsonObject.getString("Location");
-                                    String albumCoverImagePath = jsonObject.getString("AlbumCoverImagePath");
-                                    int totalLyrics = jsonObject.getInt("TotalLyrics");
-                                    int downloads = jsonObject.getInt("Downloads");
-                                    String pdfLocation = jsonObject.getString("PDFLocation");
-                                    int pdfDownloads = jsonObject.getInt("PDFDownloads");
+                                    String album = "Err";
+                                    if(jsonObject.has("Album"))
+                                        album = jsonObject.getString("Album");
+                                    String location = "Err";
+                                    if(jsonObject.has("Location"))
+                                        location = jsonObject.getString("Location");
+                                    String albumCoverImagePath = "Err";
+                                    if(jsonObject.has("AlbumCoverImagePath"))
+                                        albumCoverImagePath = jsonObject.getString("AlbumCoverImagePath");
+                                    int totalLyrics=0;
+                                    if(jsonObject.has("TotalLyrics"))
+                                        totalLyrics = jsonObject.getInt("TotalLyrics");
+                                    int downloads=0;
+                                    if(jsonObject.has("Downloads"))
+                                        downloads = jsonObject.getInt("Downloads");
+                                    String pdfLocation="Err";
+                                    if(jsonObject.has("PDFLocation"))
+                                        pdfLocation = jsonObject.getString("PDFLocation");
+                                    int pdfDownloads=0;
+                                    if(jsonObject.has("PDFDownloads"))
+                                        pdfDownloads = jsonObject.getInt("PDFDownloads");
                                     AlbumLyricsModel albumLyricsModel = new AlbumLyricsModel(album, location, albumCoverImagePath, totalLyrics, downloads, pdfLocation, pdfDownloads);
                                     mAlbumLyrics.add(albumLyricsModel);
                                 }
@@ -156,15 +205,36 @@ public class SplashScreen extends AppCompatActivity implements OnFetchUrlsListen
 
                                 for (int i = 0; i < jsonBhajanArray.length(); i++) {
                                     JSONObject jsonObject = jsonBhajanArray.getJSONObject(i);
-                                    String lyrics = jsonObject.getString("Lyrics");
-                                    String album = jsonObject.getString("Album");
-                                    String location = jsonObject.getString("Location");
-                                    int downloads = jsonObject.getInt("Downloads");
+                                    String lyrics="Err";
+                                    if(jsonObject.has("MoreLyrics"))
+                                        lyrics = jsonObject.getString("MoreLyrics");
+                                    String album = "Err";
+                                    if(jsonObject.has("Album"))
+                                        album = jsonObject.getString("Album");
+
+                                    String location = "Err";
+                                    if(jsonObject.has("Location"))
+                                        location = jsonObject.getString("Location");
+
+                                    int downloads = 0;
+                                    if(jsonObject.has("Downloads"))
+                                        downloads = jsonObject.getInt("Downloads");
+
                                     BhajanModel bhajanModel = new BhajanModel(lyrics, album, location, downloads);
                                     mBhajan.add(bhajanModel);
                                 }
 
-                                mOnFetchUrlsListener.onUrlsFetched(mLyrics, mAlbums, mAlbumLyrics, mBhajan);
+                                Log.e(TAG, "_log : onResponse : response : " + response.toString());
+                                JSONArray jsonAllSongsArray = response.getJSONArray("allsong");
+
+                                for (int i = 0; i < jsonAllSongsArray.length(); i++) {
+                                    String song = jsonAllSongsArray.getString(i);
+                                    mAllSongs.add(song);
+                                    Log.d("Song url", song);
+                                }
+
+
+                                mOnFetchUrlsListener.onUrlsFetched(mLyrics, mAlbums, mAlbumLyrics, mBhajan, mAllSongs);
 
                             } catch (JSONException e) {
                                 Log.e(TAG, "_log : onResponse : JSONException : " + e.getMessage());
@@ -184,45 +254,4 @@ public class SplashScreen extends AppCompatActivity implements OnFetchUrlsListen
         }
     }
 
-    //    private ArrayList<LyricsModel> startHeavyProcessing(String uri) {
-//        final ArrayList<LyricsModel> result = new ArrayList<LyricsModel>();
-//        JsonObjectRequest request = new JsonObjectRequest(Request.Method.GET, uri, null,
-//                new Response.Listener<JSONObject>() {
-//                    @Override
-//                    public void onResponse(JSONObject response) {
-//                        try {
-//                            JSONArray jsonArray = response.getJSONArray("getData");
-//
-//                            for (int i = 0; i < jsonArray.length(); i++) {
-//                                //result.add(jsonArray.getString(i));
-//                                //songsArray.add(jsonArray.getString(i));
-//                                //Toast.makeText(SplashScreen.this, jsonArray.getString(i), Toast.LENGTH_SHORT).show();
-//                                JSONObject jsonObject = jsonArray.getJSONObject(i);
-//                                LyricsModel lyricsModel = new LyricsModel();
-//                                lyricsModel.setAlbum(jsonObject.getString("Album"));
-//                                lyricsModel.setAlbum(jsonObject.getString("Lyrics"));
-//                                lyricsModel.setAlbum(jsonObject.getString("Location"));
-//                                lyricsModel.setAlbum(jsonObject.getString("Downloads"));
-//                                result.add(lyricsModel);
-//                            }
-//                            songs_fetched = true;
-//
-//                        }
-//                        catch (JSONException e) {
-//                            e.printStackTrace();
-//                            songs_fetched = false;
-//                            Log.d("JSON Parse", String.valueOf(e));
-//                        }
-//
-//                    }
-//                }, new Response.ErrorListener() {
-//            @Override
-//            public void onErrorResponse(VolleyError error) {
-//                error.printStackTrace();
-//                Toast.makeText(SplashScreen.this, "Load error!!", Toast.LENGTH_SHORT).show();
-//            }
-//        });
-//        mQueue.add(request);
-//        return result;
-//    }
 }

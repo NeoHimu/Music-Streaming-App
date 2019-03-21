@@ -13,5 +13,6 @@
                 android:layout_height="wrap_content"
                 android:id="@+id/idDescSongRV"
                 android:text="@string/app_name"
+                android:textColor="@color/textColor"
                 />
 </LinearLayout>

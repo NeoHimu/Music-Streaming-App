@@ -4,10 +4,6 @@ package com.himanshusingh.www.musicplayer.models;
 import android.os.Parcel;
 import android.os.Parcelable;
 
-import com.himanshusingh.www.musicplayer.Lyrics;
-
-import java.io.Serializable;
-
 /**
  * Created by himanshu on 13/3/19.
  */

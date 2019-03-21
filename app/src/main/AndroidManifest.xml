@@ -23,11 +23,12 @@
         </activity>
         <activity android:name=".MainActivity"/>
         <activity android:name=".Songs" />
-        <activity android:name=".Albums" />
-        <activity android:name=".Lyrics" />
+        <activity android:name=".MoreAlbums" />
+        <activity android:name=".MoreLyrics" />
         <activity android:name=".Player" />
         <activity android:name=".ShowLyrics" />
         <activity android:name=".LyricsAlbum" />
+        <activity android:name=".SongAlbum" />
     </application>
 
 </manifest>

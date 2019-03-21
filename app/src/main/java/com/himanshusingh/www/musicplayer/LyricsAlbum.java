@@ -59,14 +59,16 @@ public class LyricsAlbum extends AppCompatActivity implements OnFetchLyricsInAlb
     @Override
     public void onLyricsTitleClick(int position) {
         Intent i = new Intent(LyricsAlbum.this, ShowLyrics.class);
-        i.putExtra("image_url", lyrics_urls.get(position));
+        i.putExtra("pos", position);
+        i.putStringArrayListExtra("lyrics_urls", lyrics_urls);
         startActivity(i);
     }
 
     @Override
     public void onLyricsImageClick(int position) {
         Intent i = new Intent(LyricsAlbum.this, ShowLyrics.class);
-        i.putExtra("image_url", lyrics_urls.get(position));
+        i.putExtra("pos", position);
+        i.putStringArrayListExtra("lyrics_urls", lyrics_urls);
         startActivity(i);
     }
 

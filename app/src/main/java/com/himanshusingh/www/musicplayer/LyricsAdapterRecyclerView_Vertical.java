@@ -7,6 +7,9 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.himanshusingh.www.musicplayer.models.AlbumLyricsModel;
+import com.squareup.picasso.Picasso;
+
 import java.util.ArrayList;
 
 /**
@@ -15,39 +18,60 @@ import java.util.ArrayList;
 
 public class LyricsAdapterRecyclerView_Vertical extends RecyclerView.Adapter<LyricsAdapterRecyclerView_Vertical.LyricsViewHolder> {
 
-    private ArrayList<String> titles;
-    private ArrayList<String> urls;
-    public LyricsAdapterRecyclerView_Vertical(ArrayList<String> titles, ArrayList<String> urls)
+    private ArrayList<AlbumLyricsModel> albumLyricsModelArrayList;
+    private OnLyricsClickListenerMore mOnLyricsClickListenerMore;
+    public LyricsAdapterRecyclerView_Vertical(ArrayList<AlbumLyricsModel> albumLyricsModelArrayList, OnLyricsClickListenerMore onLyricsClickListenerMore)
     {
-        this.titles = titles;
-        this.urls = urls;
+        this.albumLyricsModelArrayList = albumLyricsModelArrayList;
+        this.mOnLyricsClickListenerMore = onLyricsClickListenerMore;
     }
 
     @Override
     public LyricsViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         LayoutInflater layoutInflater = LayoutInflater.from(parent.getContext());
         View view = layoutInflater.inflate(R.layout.lyrics_item_recycler_view_vertical, parent, false);
-        return new LyricsViewHolder(view);
+        return new LyricsViewHolder(view, mOnLyricsClickListenerMore);
     }
 
     @Override
     public void onBindViewHolder(LyricsViewHolder holder, int position) {
-        String title = titles.get(position);
+        String title = albumLyricsModelArrayList.get(position).getAlbum();
         holder.textView.setText(title);
+        // load image here
+        Picasso.get().load(Endpoints.BASE_URL+albumLyricsModelArrayList.get(position).getAlbumCoverImagePath().substring(2)).into(holder.imageView);
+
     }
 
     @Override
     public int getItemCount() {
-        return titles.size();
+        return albumLyricsModelArrayList.size();
     }
 
-    public class LyricsViewHolder extends RecyclerView.ViewHolder {
+    public class LyricsViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
         ImageView imageView;
         TextView textView;
-        public LyricsViewHolder(View itemView) {
+        OnLyricsClickListenerMore onLyricsClickListenerMore;
+        public LyricsViewHolder(View itemView, OnLyricsClickListenerMore onLyricsClickListenerMore) {
             super(itemView);
             imageView = itemView.findViewById(R.id.idImgLyricsRV_Vertical);
             textView = itemView.findViewById(R.id.idDescLyricsRV_Vertical);
+            imageView.setOnClickListener(this);
+            textView.setOnClickListener(this);
+            this.onLyricsClickListenerMore = onLyricsClickListenerMore;
         }
+
+        @Override
+        public void onClick(View v) {
+            if(v==imageView)
+                onLyricsClickListenerMore.onLyricsImageClickMore(getAdapterPosition());
+            else if(v==textView)
+                onLyricsClickListenerMore.onLyricsTitleClickMore(getAdapterPosition());
+        }
+    }
+
+    public interface OnLyricsClickListenerMore
+    {
+        void onLyricsTitleClickMore(int position);
+        void onLyricsImageClickMore(int position);
     }
 }

@@ -120,7 +120,7 @@ public class Player extends Activity {
                 progress.setMessage("Wait while loading...");
                 progress.setCancelable(false); // disable dismiss by tapping outside of the dialog
                 progress.show();
-                MusicManager.SoundPlayer(v.getContext(), strAudioLink, progress);
+                MusicManager.SoundPlayer(v.getContext(), strAudioLink.replace(" ", "%20"), progress);
                 handler.removeCallbacksAndMessages(null);
                 handler = new Handler();
                 seekBar.setMax(MusicManager.duration);
@@ -160,7 +160,7 @@ public class Player extends Activity {
                 progress.setMessage("Wait while loading...");
                 progress.setCancelable(false); // disable dismiss by tapping outside of the dialog
                 progress.show();
-                MusicManager.SoundPlayer(v.getContext(), strAudioLink, progress);
+                MusicManager.SoundPlayer(v.getContext(), strAudioLink.replace(" ", "%20"), progress);
                 handler.removeCallbacksAndMessages(null);
                 handler = new Handler();
                 seekBar.setMax(MusicManager.duration);

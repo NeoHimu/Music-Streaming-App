@@ -7,7 +7,9 @@
     android:layout_height="match_parent"
     tools:context="com.himanshusingh.www.musicplayer.MainActivity"
     android:orientation="vertical"
+    android:background="@color/backgroundColor"
     android:weightSum="1">
+
 <ScrollView
     android:layout_height="0dp"
     android:layout_width="match_parent"
@@ -16,17 +18,41 @@
 <RelativeLayout
     android:layout_width="match_parent"
     android:layout_height="match_parent">
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Updates"
+        android:textColor="@color/textColor"
+        android:paddingLeft="20dp"
+        android:id="@+id/idTrending"
+        android:textSize="20sp"/>
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_below="@+id/idTrending"
+        android:id="@+id/idDots"
+        />
+    <android.support.v4.view.ViewPager
+        android:layout_centerHorizontal="true"
+        android:layout_width="200dp"
+        android:layout_height="200dp"
+        android:id="@+id/idViewPager"
+        android:layout_below="@+id/idDots"></android.support.v4.view.ViewPager>
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
         android:weightSum="1"
         android:id="@+id/idFirstRV"
-        android:layout_marginTop="10dp">
+        android:layout_marginTop="10dp"
+        android:layout_below="@+id/idViewPager">
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Songs"
+            android:textColor="@color/textColor"
             android:layout_weight="0.75"
             android:paddingLeft="20dp"
             android:textSize="20sp"/>
@@ -37,7 +63,7 @@
             android:layout_weight="0.25"
             android:textAlignment="center"
             android:id="@+id/idMoreSongs"
-            android:textColor="#F00000"/>
+            android:textColor="@color/textColor"/>
     </LinearLayout>
     <android.support.v7.widget.RecyclerView
         android:layout_width="match_parent"
@@ -60,6 +86,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Albums"
+            android:textColor="@color/textColor"
             android:layout_weight="0.75"
             android:paddingLeft="20dp"
             android:textSize="20sp"/>
@@ -70,7 +97,7 @@
             android:layout_weight="0.25"
             android:textAlignment="center"
             android:id="@+id/idMoreAlbums"
-            android:textColor="#F00000"/>
+            android:textColor="@color/textColor"/>
     </LinearLayout>
 
     <android.support.v7.widget.RecyclerView
@@ -96,6 +123,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Lyrics"
+            android:textColor="@color/textColor"
             android:layout_weight="0.75"
             android:paddingLeft="20dp"
             android:textSize="20sp"/>
@@ -106,7 +134,7 @@
             android:layout_weight="0.25"
             android:textAlignment="center"
             android:id="@+id/idMoreLyrics"
-            android:textColor="#F00000"/>
+            android:textColor="@color/textColor"/>
     </LinearLayout>
     <android.support.v7.widget.RecyclerView
         android:layout_width="match_parent"
