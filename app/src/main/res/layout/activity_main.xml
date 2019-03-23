@@ -10,19 +10,59 @@
     android:background="@color/backgroundColor"
     android:weightSum="1">
 
-<ScrollView
-    android:layout_height="0dp"
+    <ScrollView
+        android:layout_height="0dp"
+        android:layout_width="match_parent"
+        android:id="@+id/idScrollbar"
+        android:layout_weight="0.9">
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+<android.support.v7.widget.Toolbar
     android:layout_width="match_parent"
-    android:id="@+id/idScrollbar"
-    android:layout_weight="0.9">
-<RelativeLayout
-    android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="wrap_content"
+    android:id="@+id/idSearchToolbar"
+    app:titleTextColor="@color/textColor"/>
+
+    <com.miguelcatalan.materialsearchview.MaterialSearchView
+        android:id="@+id/idSearchView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textColor="@color/backgroundColor"
+        android:textColorHint="@color/backgroundColor"
+        />
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/idSearchAlbumText"
+            android:textColor="@color/textColor"
+            android:layout_below="@+id/idSearchView"/>
+        <android.support.v7.widget.RecyclerView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/idSearchAlbums"
+            android:layout_below="@+id/idSearchAlbumText"
+            >
+        </android.support.v7.widget.RecyclerView>
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/idSearchLyricsText"
+            android:textColor="@color/textColor"
+            android:layout_below="@+id/idSearchAlbums"/>
+        <android.support.v7.widget.RecyclerView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/idSearchLyrics"
+            android:layout_below="@+id/idSearchLyricsText"
+            >
+        </android.support.v7.widget.RecyclerView>
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Updates"
         android:textColor="@color/textColor"
+        android:layout_below="@id/idSearchLyrics"
         android:paddingLeft="20dp"
         android:id="@+id/idTrending"
         android:textSize="20sp"/>

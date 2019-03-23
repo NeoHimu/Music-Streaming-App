@@ -7,6 +7,7 @@
     android:layout_height="match_parent"
     android:weightSum="1"
     android:orientation="vertical"
+    android:background="@color/backgroundColor"
     >
     <ImageView
         android:id="@+id/idLyricsAlbumCoverImageView"
@@ -21,6 +22,7 @@
         android:layout_height="wrap_content"
         android:id="@+id/idLyricsAlbum"
         android:layout_below="@id/idLyricsAlbumCoverImageView"
+        android:background="@color/backgroundColor"
         android:paddingLeft="10dp">
     </android.support.v7.widget.RecyclerView>
 </LinearLayout>

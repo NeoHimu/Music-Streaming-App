@@ -15,7 +15,15 @@ public class MusicManager {
     public static MediaPlayer player=new MediaPlayer();
     public static boolean isPlaying = false;
     public static int duration=0;
+    //some global variables
+    public static String current_song_name = "";
+    public static String current_song_icon_url = "";
+
     public static void SoundPlayer(Context ctx, String song_url, final ProgressDialog progressDialog){
+
+        String[] temp = song_url.split("/");
+        current_song_name = temp[temp.length-1].replace("%20", " ");
+
         player.setAudioStreamType(AudioManager.STREAM_MUSIC);
         player.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
             @Override

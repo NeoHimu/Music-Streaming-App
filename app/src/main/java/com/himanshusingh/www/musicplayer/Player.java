@@ -32,6 +32,8 @@ import android.widget.SeekBar.OnSeekBarChangeListener;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.squareup.picasso.Picasso;
+
 import java.util.ArrayList;
 
 public class Player extends Activity {
@@ -46,6 +48,7 @@ public class Player extends Activity {
     ImageView btPrev, btNext;
     Handler handler;
     Runnable runnable;
+    ImageView imageView;
 
     // -- PUT THE NAME OF YOUR AUDIO FILE HERE...URL GOES IN THE SERVICE
     String strAudioLink = "";
@@ -58,6 +61,8 @@ public class Player extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_player);
         initViews();
+        if(!MusicManager.current_song_icon_url.matches(""))
+            Picasso.get().load(MusicManager.current_song_icon_url).into(imageView);
         handler = new Handler();
         seekBar.setMax(MusicManager.player.getDuration());
         seekBar.setOnSeekBarChangeListener(new OnSeekBarChangeListener() {
@@ -98,13 +103,14 @@ public class Player extends Activity {
         assert bundle != null;
         final ArrayList<String> song_urls = bundle.getStringArrayList("song_urls");
         pos = bundle.getInt("song_pos", 0);
-        tvSongLabel.setText(bundle.getString("current_song_name"));
+//        tvSongLabel.setText(bundle.getString("current_song_name"));
+        tvSongLabel.setText(MusicManager.current_song_name);
         assert song_urls != null;
         String url = song_urls.get(pos);
         strAudioLink = Uri.parse(url).toString();
-        String[] temp = url.split("/");
-        final String song_name = temp[temp.length - 1];
-        tvSongLabel.setText(song_name);
+//        String[] temp = url.split("/");
+//        final String song_name = temp[temp.length - 1];
+//        tvSongLabel.setText(song_name);
 
 
         btNext.setOnClickListener(new View.OnClickListener() {
@@ -214,6 +220,7 @@ public class Player extends Activity {
         tvSongLabel = findViewById(R.id.idSongLabel);
         btNext = findViewById(R.id.idNext);
         btPrev = findViewById(R.id.idPrev);
+        imageView = findViewById(R.id.idCoverImageForPlayer);
 
         // --Reference seekbar in main.xml
         seekBar = (SeekBar) findViewById(R.id.idSeekBar);

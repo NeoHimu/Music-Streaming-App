@@ -51,6 +51,7 @@ public class SongAlbum extends AppCompatActivity implements OnFetchSongInAlbumLi
 
     ArrayList<String> song_urls = new ArrayList<String>();
     ArrayList<String> song_names = new ArrayList<String>();
+    ArrayList<String> song_icon_urls = new ArrayList<String>();
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -65,6 +66,7 @@ public class SongAlbum extends AppCompatActivity implements OnFetchSongInAlbumLi
             public void onClick(View v) {
                 Intent i = new Intent(SongAlbum.this, Player.class);
                 i.putStringArrayListExtra("song_urls", song_urls);
+//                i.putStringArrayListExtra("song_icon_urls", song_icon_urls);
                 i.putExtra("current_song_name", song_urls.get(current_song_position));
                 i.putExtra("song_pos", current_song_position);
                 startActivity(i);
@@ -86,6 +88,7 @@ public class SongAlbum extends AppCompatActivity implements OnFetchSongInAlbumLi
 
         albumModel = getIntent().getParcelableExtra("album_song_one_item");
         Picasso.get().load(Endpoints.BASE_URL+albumModel.getAlbumCoverImagePath()).into(imageView);
+        MusicManager.current_song_icon_url = Endpoints.BASE_URL+albumModel.getAlbumCoverImagePath();
         Log.d("song url", Endpoints.SONG_IN_ALBUM_URL+albumModel.getAlbumPath().substring(8));
         VolleyCall call = new VolleyCall(SongAlbum.this, Endpoints.SONG_IN_ALBUM_URL+albumModel.getAlbumPath().substring(8).replaceAll(" ", "%20"), SongAlbum.this);
         call.parse();
@@ -162,8 +165,9 @@ public class SongAlbum extends AppCompatActivity implements OnFetchSongInAlbumLi
         mPlayerControl.setImageResource(R.drawable.icon_pause);
 //        toolbar.setBackgroundColor(333333);
         tvCurrentSong.setText(song_names.get(position));
-        albumImage.setBackgroundResource(R.drawable.icon_cover);
-
+//        albumImage.setBackgroundResource(R.drawable.icon_cover);
+        if(!MusicManager.current_song_icon_url.matches(""))
+            Picasso.get().load(MusicManager.current_song_icon_url).into(albumImage);
         progress = new ProgressDialog(this);
         progress.setTitle("Loading");
         progress.setMessage("Wait while loading...");

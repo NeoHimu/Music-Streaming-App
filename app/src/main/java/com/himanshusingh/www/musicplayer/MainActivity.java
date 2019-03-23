@@ -3,8 +3,10 @@ package com.himanshusingh.www.musicplayer;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.content.res.Resources;
+import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.media.MediaPlayer;
+import android.os.Handler;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -12,20 +14,30 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
+import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.himanshusingh.www.musicplayer.models.AlbumLyricsModel;
 import com.himanshusingh.www.musicplayer.models.AlbumModel;
 import com.himanshusingh.www.musicplayer.models.LyricsModel;
+import com.miguelcatalan.materialsearchview.MaterialSearchView;
+import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class MainActivity extends AppCompatActivity implements SongsAdapterRecyclerView.OnSongClickListener, LyricsAdapterRecyclerView.OnLyricsClickListener, AlbumAdapterRecyclerView.OnAlbumClickListener{
+public class MainActivity extends AppCompatActivity implements SongsAdapterRecyclerView.OnSongClickListener, LyricsAdapterRecyclerView.OnLyricsClickListener, AlbumAdapterRecyclerView.OnAlbumClickListener, AlbumAdapterRecyclerView_Vertical.OnAlbumClickListenerMore, LyricsAdapterRecyclerView_Vertical.OnLyricsClickListenerMore{
+    Toolbar searchToolbar;
+    MaterialSearchView materialSearchView;
+    TextView tvSearchAlbum, tvSearchLyrics;
+    boolean doubleBackToExitPressedOnce = false;
     TextView tvMoreSongs, tvMoreAlbums, tvMoreLyrics;
     private ImageView mPlayerControl;
     Toolbar toolbar;
@@ -42,17 +54,108 @@ public class MainActivity extends AppCompatActivity implements SongsAdapterRecyc
     private ImageView mSelectedTrackImage;
     public boolean initialStage=true;
     public boolean playPause = false;
-
     private final static int NUM_PAGES = 5;
     private ViewPager mViewPager;
     private SwipeAdapter swipeAdapter;
     private List<ImageView> dots;
+    RecyclerView allAlbumList;
+    RecyclerView allLyricsList;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         toolbar = findViewById(R.id.idToolbar);
+
+        searchToolbar = findViewById(R.id.idSearchToolbar);
+        setSupportActionBar(searchToolbar);
+        getSupportActionBar().setTitle("Music Player");
+        materialSearchView = findViewById(R.id.idSearchView);
+        tvSearchAlbum = findViewById(R.id.idSearchAlbumText);
+        tvSearchLyrics = findViewById(R.id.idSearchLyricsText);
+
+        allAlbumList = findViewById(R.id.idSearchAlbums);
+        allLyricsList = findViewById(R.id.idSearchLyrics);
+
+        materialSearchView.setOnSearchViewListener(new MaterialSearchView.SearchViewListener() {
+
+            @Override
+            public void onSearchViewShown() {
+
+            }
+
+            @Override
+            public void onSearchViewClosed() {
+                tvSearchAlbum.setText("");
+                tvSearchLyrics.setText("");
+                ArrayList<AlbumModel> lstFoundAlbum = new ArrayList<AlbumModel>();
+                allAlbumList.setLayoutManager(new LinearLayoutManager(MainActivity.this));
+                allAlbumList.setAdapter(new AlbumAdapterRecyclerView_Vertical(lstFoundAlbum, MainActivity.this));
+
+                ArrayList<AlbumLyricsModel> lstFoundLyrics = new ArrayList<AlbumLyricsModel>();
+                allLyricsList.setLayoutManager(new LinearLayoutManager(MainActivity.this));
+                allLyricsList.setAdapter(new LyricsAdapterRecyclerView_Vertical(lstFoundLyrics, MainActivity.this));
+
+            }
+        });
+
+        materialSearchView.setOnQueryTextListener(new MaterialSearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                return false;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String newText) {
+                if(newText!=null && !newText.isEmpty() && newText.length()>=3)
+                {
+                    Log.d("query", newText);
+                    ArrayList<AlbumModel> lstFoundAlbum = new ArrayList<AlbumModel>();
+                    for(AlbumModel item:albumModelArrayList)
+                    {
+                        String album_name = item.getAlbum();
+                        if(album_name.toLowerCase().contains(newText))
+                        {
+                            lstFoundAlbum.add(item);
+                        }
+                    }
+
+                    if(lstFoundAlbum.size()==0)
+                        tvSearchAlbum.setText("No album found!");
+                    else
+                        tvSearchAlbum.setText("Album");
+                    allAlbumList.setLayoutManager(new LinearLayoutManager(MainActivity.this));
+                    allAlbumList.setAdapter(new AlbumAdapterRecyclerView_Vertical(lstFoundAlbum, MainActivity.this));
+
+                    ArrayList<AlbumLyricsModel> lstFoundLyrics = new ArrayList<AlbumLyricsModel>();
+                    for(AlbumLyricsModel item:albumLyricsModelArrayList)
+                    {
+                        String album_name = item.getAlbum();
+                        if(album_name.toLowerCase().contains(newText))
+                        {
+                            lstFoundLyrics.add(item);
+                        }
+                    }
+                    if(lstFoundLyrics.size()==0)
+                        tvSearchLyrics.setText("No lyrics found!");
+                    else tvSearchLyrics.setText("Lyrics");
+                    allLyricsList.setLayoutManager(new LinearLayoutManager(MainActivity.this));
+                    allLyricsList.setAdapter(new LyricsAdapterRecyclerView_Vertical(lstFoundLyrics, MainActivity.this));
+
+                    if(lstFoundAlbum.size()==0 && lstFoundLyrics.size()==0)
+                    {
+                        tvSearchLyrics.setText("");
+                        tvSearchAlbum.setText("Nothing matches your query");
+                    }
+                }
+                else
+                {
+                    // return default
+                }
+                return true;
+            }
+        });
+
         mSelectedTrackTitle = (TextView)findViewById(R.id.id_selected_track_title);
         mSelectedTrackImage = (ImageView)findViewById(R.id.id_selected_track_image);
         tvMoreSongs = findViewById(R.id.idMoreSongs);
@@ -159,6 +262,33 @@ public class MainActivity extends AppCompatActivity implements SongsAdapterRecyc
         lyricsList.setAdapter(new LyricsAdapterRecyclerView(temp_albumLyricsModelArrayList, this));
     }
 
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.menu_item, menu);
+        MenuItem menuItem = menu.findItem(R.id.id_action_search);
+        materialSearchView.setMenuItem(menuItem);
+        return true;
+    }
+
+    @Override
+    public void onBackPressed() {
+        if (doubleBackToExitPressedOnce) {
+            super.onBackPressed();
+            return;
+        }
+
+        this.doubleBackToExitPressedOnce = true;
+        Toast.makeText(this, "Please click BACK again to exit", Toast.LENGTH_SHORT).show();
+
+        new Handler().postDelayed(new Runnable() {
+
+            @Override
+            public void run() {
+                doubleBackToExitPressedOnce=false;
+            }
+        }, 2000);
+    }
+
     private void addDots() {
         dots = new ArrayList<>();
         LinearLayout dotsLayout = (LinearLayout)findViewById(R.id.idDots);
@@ -221,6 +351,11 @@ public class MainActivity extends AppCompatActivity implements SongsAdapterRecyc
             mPlayerControl.setImageResource(R.drawable.icon_pause);
         else if(!mSelectedTrackTitle.getText().toString().matches(""))
             mPlayerControl.setImageResource(R.drawable.icon_play);
+
+        mSelectedTrackTitle.setText(MusicManager.current_song_name);
+        if(!MusicManager.current_song_icon_url.matches(""))
+            Picasso.get().load(MusicManager.current_song_icon_url).into(mSelectedTrackImage);
+
     }
 
     @Override
@@ -274,5 +409,35 @@ public class MainActivity extends AppCompatActivity implements SongsAdapterRecyc
     @Override
     protected void onDestroy() {
         super.onDestroy();
+    }
+
+    @Override
+    public void onAlbumTitleClickMore(int position) {
+        Intent i = new Intent(MainActivity.this, SongAlbum.class);
+        i.putExtra("album_song_one_item", albumModelArrayList.get(position));
+        startActivity(i);
+    }
+
+    @Override
+    public void onAlbumImageClickMore(int position) {
+        Intent i = new Intent(MainActivity.this, SongAlbum.class);
+        i.putExtra("album_song_one_item", albumModelArrayList.get(position));
+        startActivity(i);
+    }
+
+    @Override
+    public void onLyricsTitleClickMore(int position) {
+        Intent i = new Intent(MainActivity.this, LyricsAlbum.class);
+        //i.putExtra("image_url", Endpoints.BASE_URL+albumLyricsModelArrayList.get(position).getAlbumCoverImagePath().substring(2));
+        i.putExtra("album_lyrics_one_item", albumLyricsModelArrayList.get(position));
+        startActivity(i);
+    }
+
+    @Override
+    public void onLyricsImageClickMore(int position) {
+        Intent i = new Intent(MainActivity.this, LyricsAlbum.class);
+        //i.putExtra("image_url", Endpoints.BASE_URL+albumLyricsModelArrayList.get(position).getAlbumCoverImagePath().substring(2));
+        i.putExtra("album_lyrics_one_item", albumLyricsModelArrayList.get(position));
+        startActivity(i);
     }
 }
