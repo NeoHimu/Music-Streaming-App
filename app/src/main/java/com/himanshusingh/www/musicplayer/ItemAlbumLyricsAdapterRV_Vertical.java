@@ -40,6 +40,7 @@ public class ItemAlbumLyricsAdapterRV_Vertical extends RecyclerView.Adapter<Item
         String title = titles.get(position);
         holder.textView.setText(title);
         Picasso.get().load(urls.get(position)).into(holder.imageView);
+        holder.downloadImage.setBackgroundResource(R.drawable.download_icon);
     }
 
     @Override
@@ -50,22 +51,27 @@ public class ItemAlbumLyricsAdapterRV_Vertical extends RecyclerView.Adapter<Item
     public class LyricsViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
         ImageView imageView;
         TextView textView;
+        ImageView downloadImage;
         OnLyricsClickListener onLyricsClickListener;
         public LyricsViewHolder(View itemView, OnLyricsClickListener onLyricsClickListener) {
             super(itemView);
             this.onLyricsClickListener = onLyricsClickListener;
             imageView = itemView.findViewById(R.id.idImgLyricsRV_Vertical_Album_Item);
             textView = itemView.findViewById(R.id.idDescLyricsRV_Vertical_Album_Item);
+            downloadImage = itemView.findViewById(R.id.idDownloadLyrics);
             imageView.setOnClickListener(this);
             textView.setOnClickListener(this);
+            downloadImage.setOnClickListener(this);
         }
 
         @Override
         public void onClick(View v) {
             if(v==textView)
                 onLyricsClickListener.onLyricsTitleClick(getAdapterPosition());
-            else
+            else if(v==imageView)
                 onLyricsClickListener.onLyricsImageClick(getAdapterPosition());
+            else if(v==downloadImage)
+                onLyricsClickListener.onDownloadLyricsClick(getAdapterPosition());
 
         }
     }
@@ -74,5 +80,6 @@ public class ItemAlbumLyricsAdapterRV_Vertical extends RecyclerView.Adapter<Item
     {
         void onLyricsTitleClick(int position);
         void onLyricsImageClick(int position);
+        void onDownloadLyricsClick(int position);
     }
 }

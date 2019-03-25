@@ -3,7 +3,9 @@ package com.himanshusingh.www.musicplayer;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.widget.Toast;
@@ -18,17 +20,21 @@ import java.util.ArrayList;
 
 public class MoreAlbums extends AppCompatActivity implements AlbumAdapterRecyclerView_Vertical.OnAlbumClickListenerMore{
     ArrayList<AlbumModel> albumModelArrayList;
+    DividerItemDecoration itemDecorator;
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_albums);
 
+        itemDecorator = new DividerItemDecoration(MoreAlbums.this, DividerItemDecoration.VERTICAL);
+        itemDecorator.setDrawable(ContextCompat.getDrawable(MoreAlbums.this, R.drawable.divider));
+
         albumModelArrayList = getIntent().getParcelableArrayListExtra("more_albums");
 
         RecyclerView allAlbumsList = findViewById(R.id.idAllAlbums);
+        allAlbumsList.addItemDecoration(itemDecorator);
         allAlbumsList.setLayoutManager(new LinearLayoutManager(this));
         allAlbumsList.setAdapter(new AlbumAdapterRecyclerView_Vertical(albumModelArrayList, this));
-
     }
 
     @Override

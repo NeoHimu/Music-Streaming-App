@@ -7,9 +7,11 @@ import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.media.MediaPlayer;
 import android.os.Handler;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
@@ -60,6 +62,7 @@ public class MainActivity extends AppCompatActivity implements SongsAdapterRecyc
     private List<ImageView> dots;
     RecyclerView allAlbumList;
     RecyclerView allLyricsList;
+    DividerItemDecoration itemDecorator;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -73,6 +76,9 @@ public class MainActivity extends AppCompatActivity implements SongsAdapterRecyc
         materialSearchView = findViewById(R.id.idSearchView);
         tvSearchAlbum = findViewById(R.id.idSearchAlbumText);
         tvSearchLyrics = findViewById(R.id.idSearchLyricsText);
+
+        itemDecorator = new DividerItemDecoration(MainActivity.this, DividerItemDecoration.VERTICAL);
+        itemDecorator.setDrawable(ContextCompat.getDrawable(MainActivity.this, R.drawable.divider));
 
         allAlbumList = findViewById(R.id.idSearchAlbums);
         allLyricsList = findViewById(R.id.idSearchLyrics);
@@ -114,7 +120,7 @@ public class MainActivity extends AppCompatActivity implements SongsAdapterRecyc
                     for(AlbumModel item:albumModelArrayList)
                     {
                         String album_name = item.getAlbum();
-                        if(album_name.toLowerCase().contains(newText))
+                        if(album_name.toLowerCase().contains(newText.toLowerCase()))
                         {
                             lstFoundAlbum.add(item);
                         }
@@ -124,6 +130,7 @@ public class MainActivity extends AppCompatActivity implements SongsAdapterRecyc
                         tvSearchAlbum.setText("No album found!");
                     else
                         tvSearchAlbum.setText("Album");
+                    allAlbumList.addItemDecoration(itemDecorator);
                     allAlbumList.setLayoutManager(new LinearLayoutManager(MainActivity.this));
                     allAlbumList.setAdapter(new AlbumAdapterRecyclerView_Vertical(lstFoundAlbum, MainActivity.this));
 
@@ -131,7 +138,7 @@ public class MainActivity extends AppCompatActivity implements SongsAdapterRecyc
                     for(AlbumLyricsModel item:albumLyricsModelArrayList)
                     {
                         String album_name = item.getAlbum();
-                        if(album_name.toLowerCase().contains(newText))
+                        if(album_name.toLowerCase().contains(newText.toLowerCase()))
                         {
                             lstFoundLyrics.add(item);
                         }
@@ -139,6 +146,7 @@ public class MainActivity extends AppCompatActivity implements SongsAdapterRecyc
                     if(lstFoundLyrics.size()==0)
                         tvSearchLyrics.setText("No lyrics found!");
                     else tvSearchLyrics.setText("Lyrics");
+                    allLyricsList.addItemDecoration(itemDecorator);
                     allLyricsList.setLayoutManager(new LinearLayoutManager(MainActivity.this));
                     allLyricsList.setAdapter(new LyricsAdapterRecyclerView_Vertical(lstFoundLyrics, MainActivity.this));
 
@@ -253,6 +261,7 @@ public class MainActivity extends AppCompatActivity implements SongsAdapterRecyc
         RecyclerView albumList = findViewById(R.id.idRVAlbums);
         albumList.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
         albumList.setAdapter(new AlbumAdapterRecyclerView(temp_albumModelArrayList, this));
+
 
         ArrayList<AlbumLyricsModel> temp_albumLyricsModelArrayList=new ArrayList<AlbumLyricsModel>();
         for(int i=0;i<NO_OF_ALBUMS;i++)
