@@ -63,12 +63,14 @@ public class MainActivity extends AppCompatActivity implements SongsAdapterRecyc
     RecyclerView allAlbumList;
     RecyclerView allLyricsList;
     DividerItemDecoration itemDecorator;
+    LinearLayout linearLayoutControlBottom;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        toolbar = findViewById(R.id.idToolbar);
+//        toolbar = findViewById(R.id.idToolbar);
+        linearLayoutControlBottom = findViewById(R.id.idControlBottom);
 
         searchToolbar = findViewById(R.id.idSearchToolbar);
         setSupportActionBar(searchToolbar);
@@ -371,7 +373,7 @@ public class MainActivity extends AppCompatActivity implements SongsAdapterRecyc
     public void onSongClick(int position) {
         pos = position;
         mPlayerControl.setImageResource(R.drawable.icon_pause);
-//        toolbar.setBackgroundColor(333333);
+        linearLayoutControlBottom.setBackgroundColor(999999);
         mSelectedTrackTitle.setText(song_names.get(position));
         mSelectedTrackImage.setBackgroundResource(R.drawable.icon_cover);
 

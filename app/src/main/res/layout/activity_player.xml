@@ -3,6 +3,7 @@
     xmlns:android="http://schemas.android.com/apk/res/android" android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
+    android:background="@color/backgroundColor"
     android:weightSum="10">
     
     <LinearLayout
@@ -27,7 +28,7 @@
             android:marqueeRepeatLimit="marquee_forever"
             android:ellipsize="marquee"
             android:scrollHorizontally="true"
-            android:textColor="@color/colorPrimaryDark"
+            android:textColor="@color/textColor"
             android:id="@+id/idSongLabel"/>
     </LinearLayout>
 

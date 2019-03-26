@@ -50,6 +50,8 @@ import java.net.URLConnection;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.LinkedList;
+import java.util.Queue;
 
 /**
  * Created by himanshu on 20/3/19.
@@ -61,6 +63,9 @@ interface OnFetchSongInAlbumListener
 }
 
 public class SongAlbum extends AppCompatActivity implements OnFetchSongInAlbumListener, ItemAlbumSongAdapterRV_Vertical.OnSongClickListener {
+    static Queue<String> q_song_url = new LinkedList<>();
+    static Queue<String> q_song_name = new LinkedList<>();
+    static Queue<String> q_song_icon_url = new LinkedList<>();
     AlbumModel albumModel;
     ImageView imageView;
     String current_url, current_title;
@@ -120,7 +125,15 @@ public class SongAlbum extends AppCompatActivity implements OnFetchSongInAlbumLi
         MusicManager.player.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
             @Override
             public void onCompletion(MediaPlayer mp) {
-                mPlayerControl.setImageResource(R.drawable.icon_play);
+                if(q_song_icon_url.size()==0) // no song in the queue
+                    mPlayerControl.setImageResource(R.drawable.icon_play);
+                else
+                {
+                    playNextSongInQueue(q_song_icon_url.peek(), q_song_url.peek(), q_song_name.peek());
+                    q_song_name.remove();
+                    q_song_url.remove();
+                    q_song_icon_url.remove();
+                }
             }
         });
 
@@ -130,6 +143,20 @@ public class SongAlbum extends AppCompatActivity implements OnFetchSongInAlbumLi
         Log.d("song url", Endpoints.SONG_IN_ALBUM_URL+albumModel.getAlbumPath().substring(8));
         VolleyCall call = new VolleyCall(SongAlbum.this, Endpoints.SONG_IN_ALBUM_URL+albumModel.getAlbumPath().substring(8).replaceAll(" ", "%20"), SongAlbum.this);
         call.parse();
+    }
+
+    private void playNextSongInQueue(String icon_url, String song_url, String song_name) {
+        current_song_position = 0;
+        mPlayerControl.setImageResource(R.drawable.icon_pause);
+        tvCurrentSong.setText(song_name);
+//        albumImage.setBackgroundResource(R.drawable.icon_cover);
+        Picasso.get().load(icon_url).into(albumImage);
+        progress = new ProgressDialog(this);
+        progress.setTitle("Loading");
+        progress.setMessage("Wait while loading...");
+        progress.setCancelable(false); // disable dismiss by tapping outside of the dialog
+        progress.show();
+        MusicManager.SoundPlayer(this, song_url.replace(" ","%20"), progress);
     }
 
     public class VolleyCall {
@@ -201,7 +228,6 @@ public class SongAlbum extends AppCompatActivity implements OnFetchSongInAlbumLi
     public void onSongTitleClick(int position) {
         current_song_position = position;
         mPlayerControl.setImageResource(R.drawable.icon_pause);
-//        toolbar.setBackgroundColor(333333);
         tvCurrentSong.setText(song_names.get(position));
 //        albumImage.setBackgroundResource(R.drawable.icon_cover);
         if(!MusicManager.current_song_icon_url.matches(""))
