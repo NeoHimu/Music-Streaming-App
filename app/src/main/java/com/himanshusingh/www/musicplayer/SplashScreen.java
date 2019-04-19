@@ -3,6 +3,8 @@ package com.himanshusingh.www.musicplayer;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -10,6 +12,8 @@ import android.os.Parcel;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+import android.view.View;
+import android.widget.Button;
 import android.widget.Toast;
 
 import com.android.volley.Request;
@@ -36,20 +40,21 @@ import java.util.ArrayList;
 
 interface OnFetchUrlsListener
 {
-    public void onUrlsFetched(ArrayList<LyricsModel> arrayList, ArrayList<AlbumModel> albumModelArrayList, ArrayList<AlbumLyricsModel> albumLyricsModelArrayList, ArrayList<BhajanModel> bhajanModelArrayList, ArrayList<String> allSongs);
+    public void onUrlsFetched(ArrayList<LyricsModel> arrayList, ArrayList<AlbumModel> albumModelArrayList, ArrayList<AlbumLyricsModel> albumLyricsModelArrayList, ArrayList<BhajanModel> bhajanModelArrayList, ArrayList<String> allSongs, ArrayList<String> arrayListSatsangSongs);
     public void onUrlsError(String error);
 }
 
 public class SplashScreen extends AppCompatActivity implements OnFetchUrlsListener{
 
     @Override
-    public void onUrlsFetched(ArrayList<LyricsModel> lyricsModelArrayList, ArrayList<AlbumModel> albumModelArrayList, ArrayList<AlbumLyricsModel> albumLyricsModelArrayList, ArrayList<BhajanModel> bhajanModelArrayList, ArrayList<String> allSongs) {
+    public void onUrlsFetched(ArrayList<LyricsModel> lyricsModelArrayList, ArrayList<AlbumModel> albumModelArrayList, ArrayList<AlbumLyricsModel> albumLyricsModelArrayList, ArrayList<BhajanModel> bhajanModelArrayList, ArrayList<String> allSongs, ArrayList<String> arrayListSatsangSongs) {
         Intent i = new Intent(SplashScreen.this, MainActivity.class);
         i.putParcelableArrayListExtra("lyrics", lyricsModelArrayList);
         i.putParcelableArrayListExtra("album", albumModelArrayList);
         i.putParcelableArrayListExtra("album_lyrics", albumLyricsModelArrayList);
         i.putParcelableArrayListExtra("bhajan", bhajanModelArrayList);
         i.putStringArrayListExtra("allsongs", allSongs);
+        i.putStringArrayListExtra("allsatsangsongs", arrayListSatsangSongs);
         startActivity(i);
         finish();
     }
@@ -63,16 +68,46 @@ public class SplashScreen extends AppCompatActivity implements OnFetchUrlsListen
     public ArrayList<String> songsArray = new ArrayList<String>();
     public static ArrayList<String> songsName = new ArrayList<String>();
     private boolean songs_fetched=false;
+    Button btReload;
+    public ArrayList<String> satsang_songs = new ArrayList<>();
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_splash_screen);
-        getWindow().getDecorView().setBackgroundColor(Color.BLACK);
-        //Since there is no fixed time to start the activity, splash screen should be done as
-        //Async task
-        VolleyCall call = new VolleyCall(SplashScreen.this, Endpoints.API_URL, SplashScreen.this);
-        call.parse();
+
+        if(isNetworkAvailable()) {
+            setContentView(R.layout.activity_splash_screen);
+            getWindow().getDecorView().setBackgroundColor(Color.BLACK);
+            //Since there is no fixed time to start the activity, splash screen should be done as
+            //Async task
+            VolleyCall call = new VolleyCall(SplashScreen.this, Endpoints.API_URL, SplashScreen.this);
+            call.parse();
+        }
+        else {
+            setContentView(R.layout.activity_no_internet);
+            btReload = findViewById(R.id.idReloadButton);
+
+            btReload.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    if(isNetworkAvailable()) {
+                        setContentView(R.layout.activity_splash_screen);
+                        getWindow().getDecorView().setBackgroundColor(Color.BLACK);
+                        //Since there is no fixed time to start the activity, splash screen should be done as
+                        //Async task
+                        VolleyCall call = new VolleyCall(SplashScreen.this, Endpoints.API_URL, SplashScreen.this);
+                        call.parse();
+                    }
+                }
+            });
+        }
+    }
+
+    private boolean isNetworkAvailable() {
+        ConnectivityManager connectivityManager
+                = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
+        return activeNetworkInfo != null && activeNetworkInfo.isConnected();
     }
 
     public class VolleyCall {
@@ -85,6 +120,7 @@ public class SplashScreen extends AppCompatActivity implements OnFetchUrlsListen
         private ArrayList<AlbumLyricsModel> mAlbumLyrics;
         private ArrayList<BhajanModel> mBhajan;
         private ArrayList<String> mAllSongs;
+        private ArrayList<String> mAllSatsangSongs;
         private RequestQueue mQueue;
 
         public VolleyCall(Context context, String url, OnFetchUrlsListener onFetchUrlsListener) {
@@ -94,6 +130,7 @@ public class SplashScreen extends AppCompatActivity implements OnFetchUrlsListen
             mAlbums = new ArrayList<>();
             mBhajan = new ArrayList<>();
             mAllSongs = new ArrayList<>();
+            mAllSatsangSongs = new ArrayList<>();
 
             mUrl = url;
             mOnFetchUrlsListener = onFetchUrlsListener;
@@ -233,8 +270,17 @@ public class SplashScreen extends AppCompatActivity implements OnFetchUrlsListen
                                     Log.d("Song url", song);
                                 }
 
+                                Log.e(TAG, "_log : onResponse : response : " + response.toString());
+                                JSONArray jsonAllSatsangSongs = response.getJSONArray("getSatsangSongs");
 
-                                mOnFetchUrlsListener.onUrlsFetched(mLyrics, mAlbums, mAlbumLyrics, mBhajan, mAllSongs);
+                                for (int i = 0; i < jsonAllSatsangSongs.length(); i++) {
+                                    String song = jsonAllSatsangSongs.getString(i);
+                                    mAllSatsangSongs.add(song);
+                                    Log.d("Satsang Song url", song);
+                                }
+
+
+                                mOnFetchUrlsListener.onUrlsFetched(mLyrics, mAlbums, mAlbumLyrics, mBhajan, mAllSongs, mAllSatsangSongs);
 
                             } catch (JSONException e) {
                                 Log.e(TAG, "_log : onResponse : JSONException : " + e.getMessage());

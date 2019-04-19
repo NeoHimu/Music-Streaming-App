@@ -7,6 +7,8 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.squareup.picasso.Picasso;
+
 import java.util.ArrayList;
 
 /**
@@ -16,10 +18,12 @@ import java.util.ArrayList;
 public class SongsAdapterRecyclerView extends RecyclerView.Adapter<SongsAdapterRecyclerView.SongViewHolder> {
 
     private ArrayList<String> data;
+    private String image_url;
     private  OnSongClickListener onSongClickListener;
-    public SongsAdapterRecyclerView(ArrayList<String> data, OnSongClickListener onSongClickListener)
+    public SongsAdapterRecyclerView(ArrayList<String> data, String image_url, OnSongClickListener onSongClickListener)
     {
         this.data = data;
+        this.image_url = image_url;
         this.onSongClickListener = onSongClickListener;
     }
 
@@ -34,6 +38,7 @@ public class SongsAdapterRecyclerView extends RecyclerView.Adapter<SongsAdapterR
     public void onBindViewHolder(SongViewHolder holder, int position) {
         String title = data.get(position);
         holder.textView.setText(title);
+        Picasso.get().load(image_url.replace(" ", "%20")).into(holder.imageView);
     }
 
     @Override

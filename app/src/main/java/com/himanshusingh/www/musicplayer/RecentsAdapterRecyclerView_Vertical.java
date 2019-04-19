@@ -12,49 +12,47 @@ import com.squareup.picasso.Picasso;
 import java.util.ArrayList;
 
 /**
- * Created by himanshu on 26/2/19.
+ * Created by himanshu on 18/4/19.
  */
 
-public class SongsAdapterRecyclerView_Vertical extends RecyclerView.Adapter<SongsAdapterRecyclerView_Vertical.SongViewHolder> {
+public class RecentsAdapterRecyclerView_Vertical extends RecyclerView.Adapter<RecentsAdapterRecyclerView_Vertical.SongViewHolder> {
 
-    OnSatsangClickListenerMore mOnSatsangClickListenerMore;
-    private ArrayList<String> data;
-    private String cover_image_url;
-    public SongsAdapterRecyclerView_Vertical(ArrayList<String> data, String cover_image_url, OnSatsangClickListenerMore onSatsangClickListenerMore)
+    OnRecentSongClickListener mOnRecentSongClickListener;
+
+
+    public RecentsAdapterRecyclerView_Vertical(OnRecentSongClickListener onRecentSongClickListener)
     {
-        this.data = data;
-        this.cover_image_url = cover_image_url;
-        this.mOnSatsangClickListenerMore = onSatsangClickListenerMore;
+        this.mOnRecentSongClickListener = onRecentSongClickListener;
     }
 
     @Override
     public SongViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         LayoutInflater layoutInflater = LayoutInflater.from(parent.getContext());
         View view = layoutInflater.inflate(R.layout.songs_item_recycler_view_vertical, parent, false);
-        return new SongViewHolder(view, mOnSatsangClickListenerMore);
+        return new SongViewHolder(view, mOnRecentSongClickListener);
     }
 
     @Override
     public void onBindViewHolder(SongViewHolder holder, int position) {
-        String title = data.get(position);
+        String title = CommonVariables.recent_song_name.get(position);
         holder.textView.setText(title);
-        Picasso.get().load(cover_image_url).into(holder.imageView);
+        Picasso.get().load(CommonVariables.recent_song_icon_url.get(position)).into(holder.imageView);
     }
 
     @Override
     public int getItemCount() {
-        return data.size();
+        return CommonVariables.recent_song_icon_url.size();
     }
 
     public class SongViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
         ImageView imageView;
         TextView textView;
-        OnSatsangClickListenerMore onSatsangClickListenerMore;
-        public SongViewHolder(View itemView, OnSatsangClickListenerMore onSatsangClickListenerMore) {
+        OnRecentSongClickListener onRecentSongClickListener;
+        public SongViewHolder(View itemView, OnRecentSongClickListener onRecentSongClickListener) {
             super(itemView);
             imageView = itemView.findViewById(R.id.idImgSongRV_Vertical);
             textView = itemView.findViewById(R.id.idDescSongRV_Vertical);
-            this.onSatsangClickListenerMore = onSatsangClickListenerMore;
+            this.onRecentSongClickListener = onRecentSongClickListener;
 
             imageView.setOnClickListener(this);
             textView.setOnClickListener(this);
@@ -63,15 +61,16 @@ public class SongsAdapterRecyclerView_Vertical extends RecyclerView.Adapter<Song
         @Override
         public void onClick(View v) {
             if(v==imageView)
-                onSatsangClickListenerMore.onSatsangImageClickMore(getAdapterPosition());
+                onRecentSongClickListener.onRecentSongImageClick(getAdapterPosition());
             else if(v==textView)
-                onSatsangClickListenerMore.onSatsangTitleClickMore(getAdapterPosition());
+                onRecentSongClickListener.onRecentSongTitleClick(getAdapterPosition());
         }
     }
 
-    public interface OnSatsangClickListenerMore
+    public interface OnRecentSongClickListener
     {
-        void onSatsangTitleClickMore(int position);
-        void onSatsangImageClickMore(int position);
+        void onRecentSongTitleClick(int position);
+        void onRecentSongImageClick(int position);
     }
 }
+

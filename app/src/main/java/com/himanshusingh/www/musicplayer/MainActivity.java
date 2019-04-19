@@ -3,7 +3,6 @@ package com.himanshusingh.www.musicplayer;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.content.res.Resources;
-import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.media.MediaPlayer;
 import android.os.Handler;
@@ -19,10 +18,8 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -35,10 +32,12 @@ import com.squareup.picasso.Picasso;
 import java.util.ArrayList;
 import java.util.List;
 
-public class MainActivity extends AppCompatActivity implements SongsAdapterRecyclerView.OnSongClickListener, LyricsAdapterRecyclerView.OnLyricsClickListener, AlbumAdapterRecyclerView.OnAlbumClickListener, AlbumAdapterRecyclerView_Vertical.OnAlbumClickListenerMore, LyricsAdapterRecyclerView_Vertical.OnLyricsClickListenerMore{
+public class MainActivity extends AppCompatActivity implements SongsAdapterRecyclerView.OnSongClickListener, LyricsAdapterRecyclerView.OnLyricsClickListener, AlbumAdapterRecyclerView.OnAlbumClickListener, AlbumAdapterRecyclerView_Vertical.OnAlbumClickListenerMore, LyricsAdapterRecyclerView_Vertical.OnLyricsClickListenerMore, SongsAdapterRecyclerView_Vertical.OnSatsangClickListenerMore{
     Toolbar searchToolbar;
     MaterialSearchView materialSearchView;
-    TextView tvSearchAlbum, tvSearchLyrics;
+    TextView tvSearchAlbum, tvSearchLyrics, tvSearchSatsang;
+    ArrayList<String> searchViewSatsangNameResult = new ArrayList<>();
+    ArrayList<String> searchViewSatsangUrlResult = new ArrayList<>();
     boolean doubleBackToExitPressedOnce = false;
     TextView tvMoreSongs, tvMoreAlbums, tvMoreLyrics;
     private ImageView mPlayerControl;
@@ -50,8 +49,9 @@ public class MainActivity extends AppCompatActivity implements SongsAdapterRecyc
     ArrayList<LyricsModel> lyricsModelArrayList;
     ArrayList<AlbumLyricsModel> albumLyricsModelArrayList;
     ArrayList<AlbumModel> albumModelArrayList;
-    ArrayList<String> song_names;
-    ArrayList<String> song_urls;
+    ArrayList<String> satsang_song_names;
+    ArrayList<String> satsang_song_urls;
+    String satsang_cover_image_url;
     private TextView mSelectedTrackTitle;
     private ImageView mSelectedTrackImage;
     public boolean initialStage=true;
@@ -62,8 +62,11 @@ public class MainActivity extends AppCompatActivity implements SongsAdapterRecyc
     private List<ImageView> dots;
     RecyclerView allAlbumList;
     RecyclerView allLyricsList;
+    RecyclerView allSatsangList;
     DividerItemDecoration itemDecorator;
     LinearLayout linearLayoutControlBottom;
+    LinearLayout recentsBtn;
+    LinearLayout queueBtn;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -71,6 +74,8 @@ public class MainActivity extends AppCompatActivity implements SongsAdapterRecyc
         setContentView(R.layout.activity_main);
 //        toolbar = findViewById(R.id.idToolbar);
         linearLayoutControlBottom = findViewById(R.id.idControlBottom);
+        recentsBtn = findViewById(R.id.idRecents);
+        queueBtn = findViewById(R.id.idQueue);
 
         searchToolbar = findViewById(R.id.idSearchToolbar);
         setSupportActionBar(searchToolbar);
@@ -78,12 +83,32 @@ public class MainActivity extends AppCompatActivity implements SongsAdapterRecyc
         materialSearchView = findViewById(R.id.idSearchView);
         tvSearchAlbum = findViewById(R.id.idSearchAlbumText);
         tvSearchLyrics = findViewById(R.id.idSearchLyricsText);
+        tvSearchSatsang = findViewById(R.id.idSearchSatsangText);
 
         itemDecorator = new DividerItemDecoration(MainActivity.this, DividerItemDecoration.VERTICAL);
         itemDecorator.setDrawable(ContextCompat.getDrawable(MainActivity.this, R.drawable.divider));
 
         allAlbumList = findViewById(R.id.idSearchAlbums);
         allLyricsList = findViewById(R.id.idSearchLyrics);
+        allSatsangList = findViewById(R.id.idSearchSatsang);
+
+
+        recentsBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent i = new Intent(MainActivity.this, Recents.class);
+                startActivity(i);
+            }
+        });
+
+
+        queueBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent i = new Intent(MainActivity.this, QueueSongs.class);
+                startActivity(i);
+            }
+        });
 
         materialSearchView.setOnSearchViewListener(new MaterialSearchView.SearchViewListener() {
 
@@ -96,6 +121,15 @@ public class MainActivity extends AppCompatActivity implements SongsAdapterRecyc
             public void onSearchViewClosed() {
                 tvSearchAlbum.setText("");
                 tvSearchLyrics.setText("");
+                tvSearchSatsang.setText("");
+                searchViewSatsangNameResult.clear();
+                searchViewSatsangUrlResult.clear();
+
+                ArrayList<String> lstFoundSatsang = new ArrayList<>();
+                allSatsangList.setLayoutManager(new LinearLayoutManager(MainActivity.this));
+                allSatsangList.setAdapter(new SongsAdapterRecyclerView_Vertical(lstFoundSatsang, satsang_cover_image_url, MainActivity.this));
+
+
                 ArrayList<AlbumModel> lstFoundAlbum = new ArrayList<AlbumModel>();
                 allAlbumList.setLayoutManager(new LinearLayoutManager(MainActivity.this));
                 allAlbumList.setAdapter(new AlbumAdapterRecyclerView_Vertical(lstFoundAlbum, MainActivity.this));
@@ -118,6 +152,30 @@ public class MainActivity extends AppCompatActivity implements SongsAdapterRecyc
                 if(newText!=null && !newText.isEmpty() && newText.length()>=3)
                 {
                     Log.d("query", newText);
+
+
+                    ArrayList<String> lstFoundSatsang = new ArrayList<>();
+                    int idx = 0;
+                    for(String item:satsang_song_names)
+                    {
+                        if(item.toLowerCase().contains(newText.toLowerCase()))
+                        {
+                            lstFoundSatsang.add(item);
+                            searchViewSatsangNameResult.add(item);
+                            searchViewSatsangUrlResult.add(satsang_song_urls.get(idx));
+                        }
+                        idx++;
+                    }
+                    if(lstFoundSatsang.size()==0)
+                        tvSearchSatsang.setText("No satsang found!");
+                    else
+                        tvSearchSatsang.setText("Satsang");
+                    allSatsangList.addItemDecoration(itemDecorator);
+                    allSatsangList.setLayoutManager(new LinearLayoutManager(MainActivity.this));
+                    allSatsangList.setAdapter(new SongsAdapterRecyclerView_Vertical(lstFoundSatsang, satsang_cover_image_url, MainActivity.this));
+
+
+
                     ArrayList<AlbumModel> lstFoundAlbum = new ArrayList<AlbumModel>();
                     for(AlbumModel item:albumModelArrayList)
                     {
@@ -152,10 +210,11 @@ public class MainActivity extends AppCompatActivity implements SongsAdapterRecyc
                     allLyricsList.setLayoutManager(new LinearLayoutManager(MainActivity.this));
                     allLyricsList.setAdapter(new LyricsAdapterRecyclerView_Vertical(lstFoundLyrics, MainActivity.this));
 
-                    if(lstFoundAlbum.size()==0 && lstFoundLyrics.size()==0)
+                    if(lstFoundSatsang.size()==0 && lstFoundAlbum.size()==0 && lstFoundLyrics.size()==0)
                     {
+                        tvSearchSatsang.setText("Nothing matches your query");
                         tvSearchLyrics.setText("");
-                        tvSearchAlbum.setText("Nothing matches your query");
+                        tvSearchAlbum.setText("");
                     }
                 }
                 else
@@ -176,14 +235,22 @@ public class MainActivity extends AppCompatActivity implements SongsAdapterRecyc
         lyricsModelArrayList = getIntent().getParcelableArrayListExtra("lyrics");
         albumLyricsModelArrayList = getIntent().getParcelableArrayListExtra("album_lyrics");
         albumModelArrayList = getIntent().getParcelableArrayListExtra("album");
-        ArrayList<String> temp_urls = getIntent().getStringArrayListExtra("allsongs");
-        song_names = new ArrayList<>();
-        song_urls = new ArrayList<>();
+        ArrayList<String> temp_urls = getIntent().getStringArrayListExtra("allsatsangsongs");
+        for(int i=0;i<albumModelArrayList.size();i++)
+        {
+            if(albumModelArrayList.get(i).getAlbum().equalsIgnoreCase("Satsang"))
+            {
+                satsang_cover_image_url = Endpoints.BASE_URL+"album/"+albumModelArrayList.get(i).getAlbumCoverImagePath().substring(8);
+            }
+        }
+        satsang_song_names = new ArrayList<>();
+        satsang_song_urls = new ArrayList<>();
         for(int i=0;i<temp_urls.size();i++)
         {
-            song_urls.add(Endpoints.SITE_URL+temp_urls.get(i).replace(" ", "%20"));
+            satsang_song_urls.add(Endpoints.SITE_URL+temp_urls.get(i).replace(" ", "%20"));
+            Log.d("song url", satsang_song_urls.get(i));
             String[] tt = temp_urls.get(i).split("/");
-            song_names.add(tt[tt.length-1]);
+            satsang_song_names.add(tt[tt.length-1]);
         }
 
         mViewPager = findViewById(R.id.idViewPager);
@@ -209,8 +276,8 @@ public class MainActivity extends AppCompatActivity implements SongsAdapterRecyc
             @Override
             public void onClick(View v) {
                 Intent i = new Intent(MainActivity.this, Player.class);
-                i.putStringArrayListExtra("song_urls", song_urls);
-                i.putExtra("current_song_name", song_names.get(pos));
+                i.putStringArrayListExtra("song_urls", satsang_song_urls);
+                i.putExtra("current_song_name", satsang_song_names.get(pos));
                 i.putExtra("song_pos", pos);
                 startActivity(i);
             }
@@ -220,8 +287,8 @@ public class MainActivity extends AppCompatActivity implements SongsAdapterRecyc
             @Override
             public void onClick(View v) {
                 Intent i = new Intent(MainActivity.this, Player.class);
-                i.putStringArrayListExtra("song_urls", song_urls);
-                i.putExtra("current_song_name", song_names.get(pos));
+                i.putStringArrayListExtra("song_urls", satsang_song_urls);
+                i.putExtra("current_song_name", satsang_song_names.get(pos));
                 i.putExtra("song_pos", pos);
                 startActivity(i);
             }
@@ -231,7 +298,12 @@ public class MainActivity extends AppCompatActivity implements SongsAdapterRecyc
         tvMoreSongs.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent i = new Intent(MainActivity.this, Songs.class);
+                Intent i = new Intent(MainActivity.this, MoreSatsang.class);
+                i.putStringArrayListExtra("more_satsang_song_urls", satsang_song_urls);
+                i.putStringArrayListExtra("more_satsang_names", satsang_song_names);
+                i.putExtra("satsang_cover_image_url", satsang_cover_image_url);
+//                i.putParcelableArrayListExtra("albumModelArrayList", albumModelArrayList);
+//                i.putParcelableArrayListExtra("albumLyricsModelArrayList", albumLyricsModelArrayList);
                 startActivity(i);
             }
         });
@@ -253,9 +325,12 @@ public class MainActivity extends AppCompatActivity implements SongsAdapterRecyc
                 startActivity(i);
             }
         });
+        ArrayList<String> temp_songNames = new ArrayList<>();
+        for(int i=0;i<NO_OF_ALBUMS;i++)
+            temp_songNames.add(satsang_song_names.get(i));
         songsList = findViewById(R.id.idRVSongs);
         songsList.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
-        songsList.setAdapter(new SongsAdapterRecyclerView(song_names, this));
+        songsList.setAdapter(new SongsAdapterRecyclerView(temp_songNames, satsang_cover_image_url, this));
 
         ArrayList<AlbumModel> temp_albumModelArrayList=new ArrayList<AlbumModel>();
         for(int i=0;i<NO_OF_ALBUMS;i++)
@@ -374,20 +449,36 @@ public class MainActivity extends AppCompatActivity implements SongsAdapterRecyc
         pos = position;
         mPlayerControl.setImageResource(R.drawable.icon_pause);
         linearLayoutControlBottom.setBackgroundColor(999999);
-        mSelectedTrackTitle.setText(song_names.get(position));
-        mSelectedTrackImage.setBackgroundResource(R.drawable.icon_cover);
-
+        mSelectedTrackTitle.setText(satsang_song_names.get(position));
+        MusicManager.current_song_icon_url = satsang_cover_image_url;
+        Picasso.get().load(satsang_cover_image_url).into(mSelectedTrackImage);//mSelectedTrackImage.setBackgroundResource(R.drawable.icon_cover);
+//        Log.d("satsang cover image ", satsang_cover_image_url);
+//        Log.d("satsang song url",  satsang_song_urls.get(position));
         progress = new ProgressDialog(this);
         progress.setTitle("Loading");
         progress.setMessage("Wait while loading...");
         progress.setCancelable(false); // disable dismiss by tapping outside of the dialog
         progress.show();
-        MusicManager.SoundPlayer(this, song_urls.get(position), progress);
+        MusicManager.SoundPlayer(this, satsang_song_urls.get(position), progress);
     }
 
     @Override
     public void onImageClick(int position) {
-        Log.d("Image: ", position+"");
+
+        pos = position;
+        mPlayerControl.setImageResource(R.drawable.icon_pause);
+        linearLayoutControlBottom.setBackgroundColor(999999);
+        mSelectedTrackTitle.setText(satsang_song_names.get(position));
+        MusicManager.current_song_icon_url = satsang_cover_image_url;
+        Picasso.get().load(satsang_cover_image_url).into(mSelectedTrackImage);//mSelectedTrackImage.setBackgroundResource(R.drawable.icon_cover);
+//        Log.d("satsang cover image ", satsang_cover_image_url);
+//        Log.d("satsang song url",  satsang_song_urls.get(position));
+        progress = new ProgressDialog(this);
+        progress.setTitle("Loading");
+        progress.setMessage("Wait while loading...");
+        progress.setCancelable(false); // disable dismiss by tapping outside of the dialog
+        progress.show();
+        MusicManager.SoundPlayer(this, satsang_song_urls.get(position), progress);
     }
 
 
@@ -402,7 +493,6 @@ public class MainActivity extends AppCompatActivity implements SongsAdapterRecyc
         //i.putExtra("image_url", Endpoints.BASE_URL+albumLyricsModelArrayList.get(position).getAlbumCoverImagePath().substring(2));
         i.putExtra("album_lyrics_one_item", albumLyricsModelArrayList.get(position));
         startActivity(i);
-
     }
 
     @Override
@@ -450,5 +540,42 @@ public class MainActivity extends AppCompatActivity implements SongsAdapterRecyc
         //i.putExtra("image_url", Endpoints.BASE_URL+albumLyricsModelArrayList.get(position).getAlbumCoverImagePath().substring(2));
         i.putExtra("album_lyrics_one_item", albumLyricsModelArrayList.get(position));
         startActivity(i);
+    }
+
+    @Override
+    public void onSatsangTitleClickMore(int position) {
+        pos = position;
+        mPlayerControl.setImageResource(R.drawable.icon_pause);
+        linearLayoutControlBottom.setBackgroundColor(999999);
+        mSelectedTrackTitle.setText(searchViewSatsangNameResult.get(position));
+        MusicManager.current_song_icon_url = satsang_cover_image_url;
+        Picasso.get().load(satsang_cover_image_url).into(mSelectedTrackImage);//mSelectedTrackImage.setBackgroundResource(R.drawable.icon_cover);
+//        Log.d("satsang cover image ", satsang_cover_image_url);
+//        Log.d("satsang song url",  satsang_song_urls.get(position));
+        progress = new ProgressDialog(this);
+        progress.setTitle("Loading");
+        progress.setMessage("Wait while loading...");
+        progress.setCancelable(false); // disable dismiss by tapping outside of the dialog
+        progress.show();
+        MusicManager.SoundPlayer(this, searchViewSatsangUrlResult.get(position), progress);
+
+    }
+
+    @Override
+    public void onSatsangImageClickMore(int position) {
+        pos = position;
+        mPlayerControl.setImageResource(R.drawable.icon_pause);
+        linearLayoutControlBottom.setBackgroundColor(999999);
+        mSelectedTrackTitle.setText(searchViewSatsangNameResult.get(position));
+        MusicManager.current_song_icon_url = satsang_cover_image_url;
+        Picasso.get().load(satsang_cover_image_url).into(mSelectedTrackImage);//mSelectedTrackImage.setBackgroundResource(R.drawable.icon_cover);
+//        Log.d("satsang cover image ", satsang_cover_image_url);
+//        Log.d("satsang song url",  satsang_song_urls.get(position));
+        progress = new ProgressDialog(this);
+        progress.setTitle("Loading");
+        progress.setMessage("Wait while loading...");
+        progress.setCancelable(false); // disable dismiss by tapping outside of the dialog
+        progress.show();
+        MusicManager.SoundPlayer(this, searchViewSatsangUrlResult.get(position), progress);
     }
 }

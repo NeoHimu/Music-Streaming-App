@@ -9,20 +9,14 @@
     android:orientation="vertical"
     android:background="@color/backgroundColor"
     android:weightSum="1">
-
-    <ScrollView
-        android:layout_height="0dp"
-        android:layout_width="match_parent"
-        android:id="@+id/idScrollbar"
-        android:layout_weight="0.8">
     <RelativeLayout
-        android:layout_width="match_parent"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content">
-<android.support.v7.widget.Toolbar
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:id="@+id/idSearchToolbar"
-    app:titleTextColor="@color/textColor"/>
+    <android.support.v7.widget.Toolbar
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/idSearchToolbar"
+        app:titleTextColor="@color/textColor"/>
 
     <com.miguelcatalan.materialsearchview.MaterialSearchView
         android:id="@+id/idSearchView"
@@ -31,12 +25,37 @@
         android:textColor="@color/backgroundColor"
         android:textColorHint="@color/backgroundColor"
         />
+    </RelativeLayout>
+    <ScrollView
+        android:layout_height="0dp"
+        android:layout_width="match_parent"
+        android:id="@+id/idScrollbar"
+        android:layout_weight="0.8"
+        android:layout_below="@+id/idSearchView">
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/idSearchSatsangText"
+            android:textColor="@color/textColor"
+            />
+        <android.support.v7.widget.RecyclerView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/idSearchSatsang"
+            android:layout_below="@+id/idSearchSatsangText"
+            >
+        </android.support.v7.widget.RecyclerView>
+
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:id="@+id/idSearchAlbumText"
             android:textColor="@color/textColor"
-            android:layout_below="@+id/idSearchView"/>
+            android:layout_below="@+id/idSearchSatsang"/>
         <android.support.v7.widget.RecyclerView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -91,7 +110,7 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Songs"
+            android:text="Satsang"
             android:textColor="@color/textColor"
             android:layout_weight="0.75"
             android:paddingLeft="20dp"

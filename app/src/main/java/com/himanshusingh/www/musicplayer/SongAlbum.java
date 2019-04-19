@@ -1,10 +1,12 @@
 package com.himanshusingh.www.musicplayer;
 
 import android.Manifest;
+import android.app.AlertDialog;
 import android.app.DownloadManager;
 import android.app.ProgressDialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.PackageManager;
@@ -21,9 +23,13 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.text.InputType;
 import android.util.Log;
+import android.view.MenuItem;
 import android.view.View;
+import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.PopupMenu;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -63,16 +69,14 @@ interface OnFetchSongInAlbumListener
 }
 
 public class SongAlbum extends AppCompatActivity implements OnFetchSongInAlbumListener, ItemAlbumSongAdapterRV_Vertical.OnSongClickListener {
-    static Queue<String> q_song_url = new LinkedList<>();
-    static Queue<String> q_song_name = new LinkedList<>();
-    static Queue<String> q_song_icon_url = new LinkedList<>();
     AlbumModel albumModel;
     ImageView imageView;
     String current_url, current_title;
+    static int pos = 0;
     private static final int PERMISSION_REQUEST_READ_WRITE_EXTERNAL_STORAGE = 20; //Arbitrary >= 0
     String TAG = "SongAlbum : download file ";
     ProgressDialog progress;
-
+    String new_playlist_name = "";
     ImageView albumImage;
     ImageView mPlayerControl;
     TextView tvCurrentSong;
@@ -124,16 +128,7 @@ public class SongAlbum extends AppCompatActivity implements OnFetchSongInAlbumLi
         });
         MusicManager.player.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
             @Override
-            public void onCompletion(MediaPlayer mp) {
-                if(q_song_icon_url.size()==0) // no song in the queue
-                    mPlayerControl.setImageResource(R.drawable.icon_play);
-                else
-                {
-                    playNextSongInQueue(q_song_icon_url.peek(), q_song_url.peek(), q_song_name.peek());
-                    q_song_name.remove();
-                    q_song_url.remove();
-                    q_song_icon_url.remove();
-                }
+            public void onCompletion(MediaPlayer mp) {  mPlayerControl.setImageResource(R.drawable.icon_play);
             }
         });
 
@@ -143,20 +138,6 @@ public class SongAlbum extends AppCompatActivity implements OnFetchSongInAlbumLi
         Log.d("song url", Endpoints.SONG_IN_ALBUM_URL+albumModel.getAlbumPath().substring(8));
         VolleyCall call = new VolleyCall(SongAlbum.this, Endpoints.SONG_IN_ALBUM_URL+albumModel.getAlbumPath().substring(8).replaceAll(" ", "%20"), SongAlbum.this);
         call.parse();
-    }
-
-    private void playNextSongInQueue(String icon_url, String song_url, String song_name) {
-        current_song_position = 0;
-        mPlayerControl.setImageResource(R.drawable.icon_pause);
-        tvCurrentSong.setText(song_name);
-//        albumImage.setBackgroundResource(R.drawable.icon_cover);
-        Picasso.get().load(icon_url).into(albumImage);
-        progress = new ProgressDialog(this);
-        progress.setTitle("Loading");
-        progress.setMessage("Wait while loading...");
-        progress.setCancelable(false); // disable dismiss by tapping outside of the dialog
-        progress.show();
-        MusicManager.SoundPlayer(this, song_url.replace(" ","%20"), progress);
     }
 
     public class VolleyCall {
@@ -229,15 +210,25 @@ public class SongAlbum extends AppCompatActivity implements OnFetchSongInAlbumLi
         current_song_position = position;
         mPlayerControl.setImageResource(R.drawable.icon_pause);
         tvCurrentSong.setText(song_names.get(position));
-//        albumImage.setBackgroundResource(R.drawable.icon_cover);
-        if(!MusicManager.current_song_icon_url.matches(""))
+        //CommonVariables.recent_song_name.add(song_names.get(position));
+        //CommonVariables.recent_song_url.add(song_urls.get(position));
+        if (!MusicManager.current_song_icon_url.matches(""))
+        {
             Picasso.get().load(MusicManager.current_song_icon_url).into(albumImage);
+           // CommonVariables.recent_song_icon_url.add(MusicManager.current_song_icon_url);
+        }
+        else
+        {
+            albumImage.setBackgroundResource(R.drawable.icon_cover);
+            //CommonVariables.recent_song_icon_url.add("R.drawable.icon_cover");
+        }
         progress = new ProgressDialog(this);
         progress.setTitle("Loading");
         progress.setMessage("Wait while loading...");
         progress.setCancelable(false); // disable dismiss by tapping outside of the dialog
         progress.show();
         MusicManager.SoundPlayer(this, song_urls.get(position).replace(" ","%20"), progress);
+
     }
 
     @Override
@@ -245,19 +236,77 @@ public class SongAlbum extends AppCompatActivity implements OnFetchSongInAlbumLi
 
     }
 
+
     @Override
-    public void onDownloadSongClick(int position) {
-        //Runtime permission request required if Android permission >= Marshmallow
-        current_url = song_urls.get(position);
-        current_title = song_names.get(position);
-        Log.d("url of the song ", current_url);
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M)
-            checkPermission(current_url, current_title);
-        else
-//            new DownloadFile().execute(current_url, current_title);
-            downloadFile(current_url, current_title);
+    public void onAddToQueueClick(int position) {
+        CommonVariables.queue_song_url.add(0, song_urls.get(position));
+        CommonVariables.queue_song_icon_url.add(0, MusicManager.current_song_icon_url);
+        CommonVariables.queue_song_name.add(0, song_names.get(position));
+        Toast.makeText(this, "Added to the Queue", Toast.LENGTH_SHORT).show();
     }
 
+    @Override
+    public void onOptionMenuClick(int position, TextView textView) {
+        pos = position;
+        //Toast.makeText(this, "Option menu clicked!", Toast.LENGTH_SHORT).show();
+        PopupMenu popupMenu = new PopupMenu(this, textView);
+        popupMenu.inflate(R.menu.option_menu);
+        popupMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+            @Override
+            public boolean onMenuItemClick(MenuItem item) {
+                switch (item.getItemId())
+                {
+                    case R.id.id_menu_share:
+                        Toast.makeText(getApplicationContext(), "Share", Toast.LENGTH_SHORT).show();
+                        Intent sharingIntent = new Intent(android.content.Intent.ACTION_SEND);
+                        sharingIntent.setType("text/plain");
+                        String shareBody = "Listen this bhajan on SSD app "+song_urls.get(pos);
+                        sharingIntent.putExtra(android.content.Intent.EXTRA_SUBJECT, "SSD bhajan");
+                        sharingIntent.putExtra(android.content.Intent.EXTRA_TEXT, shareBody);
+                        startActivity(Intent.createChooser(sharingIntent, "Share via"));
+                        break;
+
+                    case R.id.id_menu_download:
+                        Toast.makeText(getApplicationContext(), "Download is clicked", Toast.LENGTH_SHORT).show();
+                        //Runtime permission request required if Android permission >= Marshmallow
+                        current_url = song_urls.get(pos);
+                        current_title = song_names.get(pos);
+                        Log.d("url of the song ", current_url);
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M)
+                            checkPermission(current_url, current_title);
+                        else
+//                          new DownloadFile().execute(current_url, current_title);
+                            downloadFile(current_url, current_title);
+                        break;
+
+                    case R.id.id_menu_create_playlist:
+                        final EditText playlist_name = new EditText(SongAlbum.this);
+
+// Set the default text to a link of the Queen
+                        playlist_name.setHint("Enter playlist name");
+
+                        new AlertDialog.Builder(SongAlbum.this)
+                                .setTitle("New Playlist")
+                                .setView(playlist_name)
+                                .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                                    public void onClick(DialogInterface dialog, int whichButton) {
+                                        String playlist_name_string = playlist_name.getText().toString();
+
+                                    }
+                                })
+                                .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                                    public void onClick(DialogInterface dialog, int whichButton) {
+                                    }
+                                })
+                                .show();
+                    default:
+                        break;
+                }
+                return false;
+            }
+        });
+        popupMenu.show();
+    }
 
 
     private void checkPermission(String url, String title) {
@@ -357,114 +406,5 @@ public class SongAlbum extends AppCompatActivity implements OnFetchSongInAlbumLi
         else if(!tvCurrentSong.getText().toString().matches(""))
             mPlayerControl.setImageResource(R.drawable.icon_play);
     }
-
-    /**
-     * Async Task to download file from URL
-     */
-//    private class DownloadFile extends AsyncTask<String, String, String> {
-//
-//        private ProgressDialog progressDialog;
-//        private String fileName;
-//        private String folder;
-//        private boolean isDownloaded;
-//
-//        /**
-//         * Before starting background thread
-//         * Show Progress Bar Dialog
-//         */
-//        @Override
-//        protected void onPreExecute() {
-//            super.onPreExecute();
-//            this.progressDialog = new ProgressDialog(SongAlbum.this);
-//            this.progressDialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
-//            this.progressDialog.setCancelable(false);
-//            this.progressDialog.show();
-//        }
-//
-//        /**
-//         * Downloading file in background thread
-//         */
-//        @Override
-//        protected String doInBackground(String... f_url) {
-//            int count;
-//            try {
-//                //replace space with %20 : it is important
-//                URL url = new URL(f_url[0].replace(" ", "%20"));
-//                Log.d("do in background ", f_url[0]);
-//                URLConnection connection = url.openConnection();
-//                connection.connect();
-//                // getting file length
-//                int lengthOfFile = connection.getContentLength();
-//
-//                // input stream to read file - with 8k buffer
-//                InputStream input = new BufferedInputStream(url.openStream(), 8192);
-//
-//                String timestamp = new SimpleDateFormat("yyyy.MM.dd.HH.mm.ss").format(new Date());
-//
-//                //Append timestamp to file name
-//                fileName = timestamp + "_" + f_url[1];
-//
-//                //External directory path to save file
-//                folder = Environment.getExternalStorageDirectory() + "/MyMusicPlayer/";
-//
-//                //Create MyMusicPlayer folder if it does not exist
-//                File directory = new File(folder);
-//
-//                if (!directory.exists()) {
-//                    directory.mkdirs();
-//                }
-//
-//                // Output stream to write file
-//                OutputStream output = new FileOutputStream(folder + fileName);
-//
-//                byte data[] = new byte[1024];
-//
-//                long total = 0;
-//
-//                while ((count = input.read(data)) != -1) {
-//                    total += count;
-//                    // publishing the progress....
-//                    // After this onProgressUpdate will be called
-//                    publishProgress("" + (int) ((total * 100) / lengthOfFile));
-//                    Log.d(TAG, "Progress: " + (int) ((total * 100) / lengthOfFile));
-//
-//                    // writing data to file
-//                    output.write(data, 0, count);
-//                }
-//
-//                // flushing output
-//                output.flush();
-//
-//                // closing streams
-//                output.close();
-//                input.close();
-//                return "Downloaded at: " + folder + fileName;
-//
-//            } catch (Exception e) {
-//                Log.e("Error: ", e.getMessage());
-//            }
-//
-//            return "Something went wrong";
-//        }
-//
-//        /**
-//         * Updating progress bar
-//         */
-//        protected void onProgressUpdate(String... progress) {
-//            // setting progress percentage
-//            progressDialog.setProgress(Integer.parseInt(progress[0]));
-//        }
-//
-//
-//        @Override
-//        protected void onPostExecute(String message) {
-//            // dismiss the dialog after the file was downloaded
-//            this.progressDialog.dismiss();
-//
-//            // Display File path after downloading
-//            Toast.makeText(getApplicationContext(),
-//                    message, Toast.LENGTH_LONG).show();
-//        }
-//    }
 
 }

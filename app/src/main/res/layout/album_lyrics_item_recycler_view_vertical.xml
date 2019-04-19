@@ -8,22 +8,26 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:gravity="center_vertical|fill_horizontal">
+        android:gravity="center_vertical|fill_horizontal"
+        android:weightSum="1">
         <ImageView
-            android:layout_width="80dp"
+            android:layout_width="0dp"
             android:layout_height="80dp"
+            android:layout_weight="0.15"
             android:src="@drawable/icon_cover"
             android:id="@+id/idImgLyricsRV_Vertical_Album_Item"/>
         <TextView
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:id="@+id/idDescLyricsRV_Vertical_Album_Item"
             android:text="@string/app_name"
             android:textColor="@color/textColor"
+            android:layout_weight="0.75"
             />
         <ImageView
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:layout_weight="0.1"
             android:id="@+id/idDownloadLyrics"/>
     </LinearLayout>
 </ScrollView>

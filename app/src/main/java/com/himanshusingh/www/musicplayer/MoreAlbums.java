@@ -8,7 +8,6 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.widget.Toast;
 
 import com.himanshusingh.www.musicplayer.models.AlbumModel;
 
@@ -24,7 +23,7 @@ public class MoreAlbums extends AppCompatActivity implements AlbumAdapterRecycle
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_albums);
+        setContentView(R.layout.activity_albums_more);
 
         itemDecorator = new DividerItemDecoration(MoreAlbums.this, DividerItemDecoration.VERTICAL);
         itemDecorator.setDrawable(ContextCompat.getDrawable(MoreAlbums.this, R.drawable.divider));

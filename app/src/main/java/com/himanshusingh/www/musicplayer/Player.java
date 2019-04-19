@@ -62,7 +62,9 @@ public class Player extends Activity {
         setContentView(R.layout.activity_player);
         initViews();
         if(!MusicManager.current_song_icon_url.matches(""))
+        {
             Picasso.get().load(MusicManager.current_song_icon_url).into(imageView);
+        }
         handler = new Handler();
         seekBar.setMax(MusicManager.player.getDuration());
         seekBar.setOnSeekBarChangeListener(new OnSeekBarChangeListener() {
@@ -116,11 +118,18 @@ public class Player extends Activity {
         btNext.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                if(CommonVariables.recent_pos!=-1)
+                    pos = CommonVariables.recent_pos;
                 pos = (pos + 1) % (song_urls.size());
                 String[] temp = song_urls.get(pos).split("/");
                 tvSongLabel.setText(temp[temp.length - 1]);
+                //CommonVariables.recent_song_name.add(temp[temp.length - 1]);
                 buttonPlayStop.setBackgroundResource(R.drawable.icon_pause);
                 strAudioLink = song_urls.get(pos);
+                //CommonVariables.recent_song_url.add(strAudioLink);
+                // This is because next song is also from the same album => same song icon url
+                // This will vary if next song is being played from Queue.. yet to implement
+                //CommonVariables.recent_song_icon_url.add(MusicManager.current_song_icon_url);
                 progress = new ProgressDialog(v.getContext());
                 progress.setTitle("Loading");
                 progress.setMessage("Wait while loading...");
@@ -156,11 +165,18 @@ public class Player extends Activity {
         btPrev.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                if(CommonVariables.recent_pos!=-1)
+                    pos = CommonVariables.recent_pos;
                 pos = (song_urls.size() + pos - 1) % (song_urls.size());
                 String[] temp = song_urls.get(pos).split("/");
                 tvSongLabel.setText(temp[temp.length - 1]);
+                //CommonVariables.recent_song_name.add(temp[temp.length - 1]);
                 buttonPlayStop.setBackgroundResource(R.drawable.icon_pause);
                 strAudioLink = song_urls.get(pos);
+                //CommonVariables.recent_song_url.add(strAudioLink);
+                // This is because next song is also from the same album => same song icon url
+                // This will vary if next song is being played from Queue.. yet to implement
+                //CommonVariables.recent_song_icon_url.add(MusicManager.current_song_icon_url);
                 progress = new ProgressDialog(v.getContext());
                 progress.setTitle("Loading");
                 progress.setMessage("Wait while loading...");

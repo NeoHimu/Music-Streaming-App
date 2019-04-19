@@ -8,10 +8,8 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.widget.Toast;
 
 import com.himanshusingh.www.musicplayer.models.AlbumLyricsModel;
-import com.himanshusingh.www.musicplayer.models.AlbumModel;
 
 import java.util.ArrayList;
 
@@ -25,7 +23,7 @@ public class MoreLyrics extends AppCompatActivity implements LyricsAdapterRecycl
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_lyrics);
+        setContentView(R.layout.activity_lyrics_more);
         itemDecorator = new DividerItemDecoration(MoreLyrics.this, DividerItemDecoration.VERTICAL);
         itemDecorator.setDrawable(ContextCompat.getDrawable(MoreLyrics.this, R.drawable.divider));
 

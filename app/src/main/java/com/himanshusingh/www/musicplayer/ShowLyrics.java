@@ -33,8 +33,8 @@ public class ShowLyrics extends AppCompatActivity {
         Bundle bundle = getIntent().getExtras();
         current_position = bundle.getInt("pos");
         lyrics_urls = bundle.getStringArrayList("lyrics_urls");
+        //CommonVariables.recent_lyrics_url.add(lyrics_urls.get(current_position));
         Picasso.get().load(lyrics_urls.get(current_position)).into(imageView);
-
 
         gdt = new GestureDetector(new GestureListener());
         imageView.setOnTouchListener(new View.OnTouchListener()
@@ -56,6 +56,7 @@ public class ShowLyrics extends AppCompatActivity {
                 //Toast.makeText(getApplicationContext(), "You have swipped left side", Toast.LENGTH_SHORT).show();
                /* Code that you want to do on swiping left side*/
                current_position = (current_position+1)%lyrics_urls.size();
+                //CommonVariables.recent_lyrics_url.add(lyrics_urls.get(current_position));
                 Picasso.get().load(lyrics_urls.get(current_position)).into(imageView);
                 return false;
             }
@@ -63,6 +64,7 @@ public class ShowLyrics extends AppCompatActivity {
             {
                 //Toast.makeText(getApplicationContext(), "You have swipped right side", Toast.LENGTH_SHORT).show();
               /* Code that you want to do on swiping right side*/
+                //CommonVariables.recent_lyrics_url.add(lyrics_urls.get(current_position));
                current_position = (lyrics_urls.size()+current_position-1)%lyrics_urls.size();
                 Picasso.get().load(lyrics_urls.get(current_position)).into(imageView);
                 return false;

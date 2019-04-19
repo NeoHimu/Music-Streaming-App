@@ -8,22 +8,41 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:gravity="center_vertical|fill_horizontal">
+        android:gravity="center_vertical|fill_horizontal"
+        android:weightSum="1">
         <ImageView
-            android:layout_width="80dp"
-            android:layout_height="80dp"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
             android:src="@drawable/icon_cover"
-            android:id="@+id/idImgSongRV_Vertical_Album_Item"/>
+            android:id="@+id/idImgSongRV_Vertical_Album_Item"
+            android:layout_weight="0.1"/>
         <TextView
-            android:layout_width="wrap_content"
+            android:paddingLeft="10dp"
+            android:paddingRight="10dp"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:id="@+id/idDescSongRV_Vertical_Album_Item"
             android:text="@string/app_name"
             android:textColor="@color/textColor"
+            android:layout_weight="0.7"
             />
         <ImageView
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:id="@+id/idDownloadSong"/>
+            android:id="@+id/idAddToQueue"
+            android:layout_weight="0.1"
+            android:background="@drawable/icon_add"/>
+        <TextView
+            android:id="@+id/idTextViewOptions"
+            android:layout_width="0dp"
+            android:layout_weight="0.1"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentTop="true"
+            android:textColor="@color/buttonColor"
+            android:text="&#8942;"
+            android:textAppearance="?android:textAppearanceLarge"
+            android:layout_marginLeft="20dp"
+            />
     </LinearLayout>
 </ScrollView>

@@ -12,13 +12,16 @@ import android.database.sqlite.SQLiteOpenHelper;
 
 public class DatabaseHelper extends SQLiteOpenHelper {
 
-    public static final String DATABASE_NAME = "urls";
-    public static final String SONG_TABLE_NAME = "songs";
+    public static final String DATABASE_NAME = "playlist";
+    public static String SONG_TABLE_NAME = "favourites";
     public static final String COL1 = "ID";
-    public static final String COL2 = "URL";
+    public static final String COL2 = "SONG_URL";
+    public static final String COL3 = "SONG_NAME";
+    public static final String COL4 = "SONG_ICON_URL";
 
-    public DatabaseHelper(Context context) {
+    public DatabaseHelper(Context context, String table_name) {
         super(context, DATABASE_NAME, null, 1);
+        this.SONG_TABLE_NAME = table_name;
     }
 
     @Override
@@ -31,11 +34,14 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         db.execSQL("DROP TABLE IF EXISTS "+SONG_TABLE_NAME);
     }
 
-    public boolean insertSongURL(String url)
+    public boolean insertSongURL(String song_url, String song_icon_url, String song_name)
     {
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues contentValues = new ContentValues();
-        contentValues.put(COL2, url);
+        contentValues.put(COL2, song_url);
+        contentValues.put(COL3, song_name);
+        contentValues.put(COL4, song_icon_url);
+
         long result  = db.insert(SONG_TABLE_NAME, null, contentValues);
         if(result==-1)
             return false;
