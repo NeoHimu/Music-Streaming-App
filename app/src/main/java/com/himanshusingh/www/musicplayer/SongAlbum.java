@@ -82,6 +82,7 @@ public class SongAlbum extends AppCompatActivity implements OnFetchSongInAlbumLi
     TextView tvCurrentSong;
     int current_song_position=0;
     long downloadID;
+    static boolean isFromMenu = false;
     BroadcastReceiver onDownloadComplete = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
@@ -96,7 +97,6 @@ public class SongAlbum extends AppCompatActivity implements OnFetchSongInAlbumLi
 
     ArrayList<String> song_urls = new ArrayList<String>();
     ArrayList<String> song_names = new ArrayList<String>();
-    ArrayList<String> song_icon_urls = new ArrayList<String>();
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -113,7 +113,6 @@ public class SongAlbum extends AppCompatActivity implements OnFetchSongInAlbumLi
             public void onClick(View v) {
                 Intent i = new Intent(SongAlbum.this, Player.class);
                 i.putStringArrayListExtra("song_urls", song_urls);
-//                i.putStringArrayListExtra("song_icon_urls", song_icon_urls);
                 i.putExtra("current_song_name", song_urls.get(current_song_position));
                 i.putExtra("song_pos", current_song_position);
                 startActivity(i);
@@ -178,6 +177,8 @@ public class SongAlbum extends AppCompatActivity implements OnFetchSongInAlbumLi
                 public void onErrorResponse(VolleyError error) {
                     Log.e(TAG, "_log : onErrorResponse : error : " + error.getMessage());
                     mOnFetchSongInAlbumListener.onUrlsError(error.getMessage());
+                    Log.d("SongAlbum ", "Retrying");
+                    parse();
                 }
             });
 
@@ -239,14 +240,14 @@ public class SongAlbum extends AppCompatActivity implements OnFetchSongInAlbumLi
 
     @Override
     public void onAddToQueueClick(int position) {
-        CommonVariables.queue_song_url.add(0, song_urls.get(position));
-        CommonVariables.queue_song_icon_url.add(0, MusicManager.current_song_icon_url);
+        CommonVariables.queue_song_url.add(0, song_urls.get(position).replace(" ","%20"));
+        CommonVariables.queue_song_icon_url.add(0, MusicManager.current_song_icon_url.replace(" ","%20"));
         CommonVariables.queue_song_name.add(0, song_names.get(position));
         Toast.makeText(this, "Added to the Queue", Toast.LENGTH_SHORT).show();
     }
 
     @Override
-    public void onOptionMenuClick(int position, TextView textView) {
+    public void onOptionMenuClick(final int position, TextView textView) {
         pos = position;
         //Toast.makeText(this, "Option menu clicked!", Toast.LENGTH_SHORT).show();
         PopupMenu popupMenu = new PopupMenu(this, textView);
@@ -290,8 +291,8 @@ public class SongAlbum extends AppCompatActivity implements OnFetchSongInAlbumLi
                                 .setView(playlist_name)
                                 .setPositiveButton("OK", new DialogInterface.OnClickListener() {
                                     public void onClick(DialogInterface dialog, int whichButton) {
-                                        String playlist_name_string = playlist_name.getText().toString();
-
+                                        DatabaseHelper myDb = new DatabaseHelper(getApplicationContext());
+                                        myDb.insertPlaylistName(playlist_name.getText().toString());
                                     }
                                 })
                                 .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
@@ -299,10 +300,22 @@ public class SongAlbum extends AppCompatActivity implements OnFetchSongInAlbumLi
                                     }
                                 })
                                 .show();
-                    default:
                         break;
+
+                    case R.id.id_menu_add_to_playlist:
+                        SongAlbum.isFromMenu = true;
+                        Intent i = new Intent(SongAlbum.this, PlayLists.class);
+                        i.putExtra("song_url", song_urls.get(position));
+                        i.putExtra("song_icon_url", Endpoints.BASE_URL+albumModel.getAlbumCoverImagePath());
+                        i.putExtra("song_name", song_names.get(position));
+                        startActivity(i);
+                        break;
+
+                    default:
+                        return SongAlbum.super.onOptionsItemSelected(item);
+
                 }
-                return false;
+                return true;
             }
         });
         popupMenu.show();

@@ -292,6 +292,8 @@ public class SplashScreen extends AppCompatActivity implements OnFetchUrlsListen
                 public void onErrorResponse(VolleyError error) {
                     Log.e(TAG, "_log : onErrorResponse : error : " + error.getMessage());
                     mOnFetchUrlsListener.onUrlsError(error.getMessage());
+                    Log.d("SplachScreen", "Retrying");
+                    //parse();
                 }
             });
 

@@ -36,6 +36,8 @@
         <activity android:name=".RecentSongAndLyrics" />
         <activity android:name=".Recents" />
         <activity android:name=".QueueSongs" />
+        <activity android:name=".PlayLists" />
+        <activity android:name=".SongsInPlaylist" />
     </application>
 
 </manifest>

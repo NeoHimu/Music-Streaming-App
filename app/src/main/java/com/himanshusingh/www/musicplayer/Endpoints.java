@@ -5,7 +5,7 @@ package com.himanshusingh.www.musicplayer;
  */
 
 public class Endpoints {
-    public static final String SITE_URL = "http://f03640b7.ngrok.io";
+    public static final String SITE_URL = "http://fbd4de44.ngrok.io";
     public static final String BASE_URL = SITE_URL+"/audio/data/WebsiteSourceCode/";
     public static final String API_URL = SITE_URL+"/audio/data/WebsiteSourceCode/database/lyrics_api.php/?query=everything";
     public static final String LYRICS_IN_ALBUM_URL = SITE_URL+"/audio/data/WebsiteSourceCode/database/all_songs_in_a_lyrical_album.php/?lyrical_album_name=";

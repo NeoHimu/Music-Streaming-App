@@ -8,6 +8,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 
 /**
  * Created by himanshu on 18/4/19.
@@ -34,6 +35,7 @@ public class QueueSongs extends AppCompatActivity implements QueueAdapterRecycle
     public void onQueueSongTitleClick(int position) {
         CommonVariables.queue_pos = position;
         MusicManager.current_song_icon_url = CommonVariables.queue_song_icon_url.get(position);
+        Log.d("queue song ", MusicManager.current_song_icon_url);
         progress = new ProgressDialog(this);
         progress.setTitle("Loading");
         progress.setMessage("Wait while loading...");
@@ -47,6 +49,7 @@ public class QueueSongs extends AppCompatActivity implements QueueAdapterRecycle
     public void onQueueSongImageClick(int position) {
         CommonVariables.queue_pos = position;
         MusicManager.current_song_icon_url = CommonVariables.queue_song_icon_url.get(position);
+        Log.d("queue song ", MusicManager.current_song_icon_url);
         progress = new ProgressDialog(this);
         progress.setTitle("Loading");
         progress.setMessage("Wait while loading...");

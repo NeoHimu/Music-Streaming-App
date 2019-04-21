@@ -4,6 +4,7 @@
     <item android:id="@+id/id_menu_download" android:title="Download"/>
     <item android:id="@+id/id_menu_share" android:title="Share"/>
     <item android:id="@+id/id_menu_create_playlist" android:title="Create Playlist"/>
+    <item android:id="@+id/id_menu_add_to_playlist" android:title="Add to Playlist"/>
 
 
 </menu>

@@ -3,6 +3,7 @@ package com.himanshusingh.www.musicplayer;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.content.res.Resources;
+import android.database.Cursor;
 import android.graphics.drawable.Drawable;
 import android.media.MediaPlayer;
 import android.os.Handler;
@@ -67,6 +68,7 @@ public class MainActivity extends AppCompatActivity implements SongsAdapterRecyc
     LinearLayout linearLayoutControlBottom;
     LinearLayout recentsBtn;
     LinearLayout queueBtn;
+    LinearLayout playlistBtn;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -76,6 +78,7 @@ public class MainActivity extends AppCompatActivity implements SongsAdapterRecyc
         linearLayoutControlBottom = findViewById(R.id.idControlBottom);
         recentsBtn = findViewById(R.id.idRecents);
         queueBtn = findViewById(R.id.idQueue);
+        playlistBtn = findViewById(R.id.idMyPlaylists);
 
         searchToolbar = findViewById(R.id.idSearchToolbar);
         setSupportActionBar(searchToolbar);
@@ -93,6 +96,9 @@ public class MainActivity extends AppCompatActivity implements SongsAdapterRecyc
         allSatsangList = findViewById(R.id.idSearchSatsang);
 
 
+        loadRecentSongs();
+        loadQueueSongs();
+
         recentsBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -106,6 +112,14 @@ public class MainActivity extends AppCompatActivity implements SongsAdapterRecyc
             @Override
             public void onClick(View v) {
                 Intent i = new Intent(MainActivity.this, QueueSongs.class);
+                startActivity(i);
+            }
+        });
+
+        playlistBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent i = new Intent(MainActivity.this, PlayLists.class);
                 startActivity(i);
             }
         });
@@ -348,6 +362,36 @@ public class MainActivity extends AppCompatActivity implements SongsAdapterRecyc
         lyricsList.setAdapter(new LyricsAdapterRecyclerView(temp_albumLyricsModelArrayList, this));
     }
 
+    private void loadRecentSongs(){
+        DatabaseHelper myDb2 = new DatabaseHelper(this);
+        myDb2.createTable(CommonVariables.RECENT_TABLE_NAME);
+        Cursor ress = myDb2.getAllSongs(CommonVariables.RECENT_TABLE_NAME);
+        if(ress.getCount()!=0)
+        {
+            while (ress.moveToNext())
+            {
+                CommonVariables.recent_song_url.add(ress.getString(1));
+                CommonVariables.recent_song_name.add(ress.getString(2));
+                CommonVariables.recent_song_icon_url.add(ress.getString(3));
+            }
+        }
+    }
+
+    private void loadQueueSongs(){
+        DatabaseHelper myDb2 = new DatabaseHelper(this);
+        myDb2.createTable(CommonVariables.QUEUE_TABLE_NAME);
+        Cursor ress = myDb2.getAllSongs(CommonVariables.QUEUE_TABLE_NAME);
+        if(ress.getCount()!=0)
+        {
+            while (ress.moveToNext())
+            {
+                CommonVariables.queue_song_url.add(ress.getString(1));
+                CommonVariables.queue_song_name.add(ress.getString(2));
+                CommonVariables.queue_song_icon_url.add(ress.getString(3));
+            }
+        }
+    }
+
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.menu_item, menu);
@@ -510,6 +554,25 @@ public class MainActivity extends AppCompatActivity implements SongsAdapterRecyc
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        updateQueueAndRecentTables();
+    }
+
+    private void updateQueueAndRecentTables() {
+
+        DatabaseHelper myDb = new DatabaseHelper(this);
+        myDb.eraseAll(CommonVariables.QUEUE_TABLE_NAME);
+        myDb.eraseAll(CommonVariables.RECENT_TABLE_NAME);
+
+        //insert the updated values from queue and recent lists
+        for(int i=0;i<CommonVariables.recent_song_name.size();i++)
+        {
+            myDb.insertSongInPlaylist(CommonVariables.recent_song_url.get(i), CommonVariables.recent_song_icon_url.get(i), CommonVariables.recent_song_name.get(i), CommonVariables.RECENT_TABLE_NAME);
+        }
+
+        for(int i=0;i<CommonVariables.queue_song_name.size();i++)
+        {
+            myDb.insertSongInPlaylist(CommonVariables.queue_song_url.get(i), CommonVariables.queue_song_icon_url.get(i), CommonVariables.queue_song_name.get(i), CommonVariables.QUEUE_TABLE_NAME);
+        }
     }
 
     @Override

@@ -7,6 +7,9 @@ import java.util.ArrayList;
  */
 
 public class CommonVariables {
+    static String RECENT_TABLE_NAME = "recents";
+    static String QUEUE_TABLE_NAME = "queue";
+
     static ArrayList<String> recent_song_url = new ArrayList<String>();
     static ArrayList<String> recent_song_icon_url = new ArrayList<String>();
     static ArrayList<String> recent_song_name = new ArrayList<String>();
