@@ -1,5 +1,3 @@
-# Music-Streaming-App
-
 # Server Code location
 Keep the audio folder in /opt/lampp/htdoc folder in Ubuntu system. audio folder has the server code. In /audio/data/WebsiteSourceCode/ folder there will be many subfolders where a file named "mp3 files here" is there. Delete this file from all these subfolders and keep your mp3 files there. 
 
@@ -8,7 +6,7 @@ First kill already running instance of apache2 server (it was causing problem in
 
 sudo lsof -i:80
 
-sudo kill <pid>
+sudo kill pid_of_apache2
  
  
 Now start the apache server
@@ -27,6 +25,8 @@ public static final String SITE_URL = "http://fbd4de44.ngrok.io";
 
 
 I have installed XAMPP server which has MySQL and Apache together. It is easier to use this way rather than installing them separately.
+
+# Few screens of the app:
 
 ![25%](images/1.png)
 
