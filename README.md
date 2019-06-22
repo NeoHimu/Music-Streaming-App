@@ -18,19 +18,19 @@ Copy the url and paste it in Endpoints.java file like : public static final Stri
 
 I have installed XAMPP server which has MySQL and Apache together. It is easier to use this way rather than installing them separately.
 
-![25%](1.png)
+![25%](images/1.png)
 
-![25%](2.png)
+![25%](images/2.png)
 
-![25%](3.png)
+![25%](images/3.png)
 
-![25%](4.png)
+![25%](images/4.png)
 
-![25%](5.png)
+![25%](images/5.png)
 
-![25%](6.png)
+![25%](images/6.png)
 
-![25%](7.png)
+![25%](images/7.png)
 
 
 #Some tutorials
