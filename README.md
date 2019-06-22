@@ -1,21 +1,38 @@
 # Music-Streaming-App
-An android app for streaming songs from a php server. Web version of the app : http://www.sachosatrambhajan.in/
 
-RecyclerView tutorial : https://www.youtube.com/watch?v=IGGT_jfZQrA&t=857s and https://www.youtube.com/watch?v=SBQm3V_0Pow&t=326s
+# Server Code location
+Keep the audio folder in /opt/lampp/htdoc folder in Ubuntu system. audio folder has the server code. In /audio/data/WebsiteSourceCode/ folder there will be many subfolders where a file named "mp3 files here" is there. Delete this file from all these subfolders and keep your mp3 files there. 
 
-SQLite database videos : https://www.youtube.com/watch?v=cp2rL3sAFmI
+# Run the server 
+First kill already running instance of apache2 server (it was causing problem in my system)
+sudo lsof -i:80
+sudo kill <pid>
+ 
+Now start the apache server
+sudo /opt/lampp/lampp start
 
-Data loading in Splash Activity : https://stackoverflow.com/questions/31473557/android-display-splash-screen-while-loading
+Run ngrok command for port forwarding
+ngrok http 80
 
-Music Player UI help : https://www.youtube.com/watch?v=pZjdrEmq36A
+Copy the url and paste it in Endpoints.java file like : public static final String SITE_URL = "http://fbd4de44.ngrok.io";
 
-Parse JSON : https://www.youtube.com/watch?v=y2xtLqP8dSQ
+I have installed XAMPP server which has MySQL and Apache together. It is easier to use this way rather than installing them separately.
 
-PHP REST API : https://www.youtube.com/watch?v=5eWC-lf1FxM
+![25%](1.png)
 
-RecyclerView click event : https://www.youtube.com/watch?v=69C1ljfDvl0 This video just tells about clicking a view. This code can easily be modified to capture events for click on each part of the view i.e. ImageView, TextView inside the recycler view.
+![25%](2.png)
 
-Music Streaming and handling seekbar : https://www.youtube.com/watch?v=J3kwFMkAsJ0
+![25%](3.png)
 
+![25%](4.png)
+
+![25%](5.png)
+
+![25%](6.png)
+
+![25%](7.png)
+
+
+#Some tutorials
 These two links helped a lot : https://www.sitepoint.com/develop-music-streaming-android-app/
 https://stackoverflow.com/questions/14728945/play-stop-sound-from-another-activity
