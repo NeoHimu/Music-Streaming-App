@@ -1,4 +1,4 @@
-# Server Code location
+# PHP Server Code location
 Keep the audio folder in /opt/lampp/htdoc folder in Ubuntu system. audio folder has the server code. In /audio/data/WebsiteSourceCode/ folder there will be many subfolders where a file named "mp3 files here" is there. Delete this file from all these subfolders and keep your mp3 files there. 
 
 # Run the server 
